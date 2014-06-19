@@ -1,5 +1,5 @@
 <?php
-namespace DivinElegy;
+namespace DivinElegy\BLL;
 
 class Simfile
 {
