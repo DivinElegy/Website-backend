@@ -1,0 +1,12 @@
+{
+    "require": {
+        "mnapoli/php-di": "~4.0"
+    },    
+    "autoload": {
+        "psr-0": {
+            "Domain" : "./",
+            "DataAccess" : "./"
+        },
+        "files" : ["./DataAccess/functions.php"]
+    }
+}

@@ -1,1 +1,1 @@
-rock n roll
+Project depends on PHP-DI for dependency injection. Run `composer install` to sort that out.

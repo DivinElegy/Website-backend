@@ -1,2 +1,4 @@
 nbproject
 logs
+composer.lock
+vendor
