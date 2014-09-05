@@ -12,6 +12,8 @@ class AbstractPopulationHelper
     const REFERENCE_FORWARD = 1;
     const REFERENCE_BACK = 2;
     const REFERENCE_SELF = 3;
+    const QUERY_TYPE_UPDATE = 'update';
+    const QUERY_TYPE_CREATE = 'create';
     
     static function getConstrutorArray($maps, $entity, $row, $db)
     {
@@ -74,7 +76,7 @@ class AbstractPopulationHelper
                             if($id)
                             {
                                 $query .= sprintf('%s=%u, ',
-                                    strtolower($mapsHelper->getVOName() . '_id'),
+                                    strtolower($mapsHelper->getTableName() . '_id'),
                                     $voTableId);
                             } else {
                                 // we have a forward reference to a value object.
@@ -98,13 +100,14 @@ class AbstractPopulationHelper
                             {
                                 if($id)
                                 {
-                                    //TODO: logic to determine what the value is? i.e., string, int etc?
-                                    $query .= sprintf('%s="%s, "',
+                                    //TODO: logic to detemine what the value is? i.e., string, int etc?
+                                    $query .= sprintf('%s="%s", ',
                                         $columnName,
                                         $columnValue
                                     );
                                 } else {
-                                    $queryColumnNamesAndValues[$columnName] = $columnValue;
+                                    //TODO: logic to detemine what the value is? i.e., string, int etc?
+                                    $queryColumnNamesAndValues[$columnName] = sprintf('"%s"', $columnValue);
                                 }
                             }
 
@@ -226,10 +229,16 @@ class AbstractPopulationHelper
                         $voIds = self::mapVOArrayToIds($maps[$subEntityMapsIndex]['table'],
                             array(strtolower($entityMapsIndex . '_id'), $id),
                             $db);
-
+                        
                         foreach($property as $index => $propertyArrayElement)
                         {
-                            self::generateUpdateSaveQuery($maps, $propertyArrayElement, $voIds[$index], $db, $queries);
+                            $extra = array(strtolower($entityMapsIndex . '_id') => $id);
+                            if(isset($voIds[$index]))
+                            {
+                                self::generateUpdateSaveQuery($maps, $propertyArrayElement, $voIds[$index], $db, $queries, $extra);
+                            } else {
+                                self::generateUpdateSaveQuery($maps, $propertyArrayElement, NULL, $db, $queries, $extra);
+                            }
                         }
 
                         break;
@@ -250,12 +259,14 @@ class AbstractPopulationHelper
         {
             $query = substr($query, 0, -2);
             $query .= sprintf(' WHERE id=%u', $id);
+            $queries['TYPE'] = self::QUERY_TYPE_UPDATE;
         } else {
             $queryColumnNamesAndValues = array_merge($queryColumnNamesAndValues, $extraColumns);
             $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
                 $maps[$entityMapsIndex]['table'],
                 implode(', ', array_keys($queryColumnNamesAndValues)),
                 implode(', ', $queryColumnNamesAndValues));
+            $queries['TYPE'] = self::QUERY_TYPE_CREATE;
         }
         
         $queries[] = $query;

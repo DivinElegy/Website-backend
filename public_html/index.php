@@ -57,6 +57,8 @@ $simfile = $simfileStepByStepBuilder->With_Title('Brand New Simfile')
 
 //$user->setId(NULL);
 
+$simfile = $DataMapper->find(1, 'Simfile');
+$simfile->addStepChart($stepChart);
 $DataMapper->save($simfile);
 
 

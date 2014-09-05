@@ -2,6 +2,8 @@
 
 namespace Domain\Entities\StepMania;
 
+use Domain\VOs\StepMania\IStepChart;
+
 interface ISimfile
 {
     public function getTitle();
@@ -13,6 +15,6 @@ interface ISimfile
     public function hasFgChanges();
     public function hasBgChanges();
         
-    public function addStepChart(StepChart $stepChart);
+    public function addStepChart(IStepChart $stepChart);
     public function getSteps();
 }

@@ -92,7 +92,7 @@ class Simfile extends AbstractEntity implements ISimfile
         return $this->_bgChanges;
     }
     
-    public function addStepChart(StepChart $stepChart) {
+    public function addStepChart(IStepChart $stepChart) {
         $this->_steps[] = $stepChart;
     }
     
