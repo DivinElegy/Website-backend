@@ -3,8 +3,9 @@
 namespace Domain\Entities\StepMania;
 
 use Domain\VOs\StepMania\IStepChart;
+use Domain\Entities\IDivineEntity;
 
-interface ISimfile
+interface ISimfile extends IDivineEntity
 {
     public function getTitle();
     public function getArtist();

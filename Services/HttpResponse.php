@@ -68,6 +68,8 @@ class HttpResponse implements IHttpResponse
     public function setBody($content)
     {
         $this->_body = $content;
+        
+        return $this;
     }
     
     public function getBody()
@@ -79,6 +81,8 @@ class HttpResponse implements IHttpResponse
     private function sendBody()
     {
         echo $this->_body;
+        
+        return $this;
     }
         
     public function sendResponse()

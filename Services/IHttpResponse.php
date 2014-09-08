@@ -9,7 +9,7 @@ interface IHttpResponse
     public function setStatusCode($code);
     public function setHeader($name, $value);
     public function getHeaders();
-    public function setBody();
+    public function setBody($body);
     public function getBody();
     public function isRedirect();
     public function sendResponse();

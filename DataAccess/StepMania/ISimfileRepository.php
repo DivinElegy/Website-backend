@@ -2,11 +2,12 @@
 
 namespace DataAccess\StepMania;
 
-use Domain\Entities\StepMania\Simfile;
+use Domain\Entities\StepMania\ISimfile;
 
 interface ISimfileRepository
 {
     public function find($id);
-    public function save(Simfile $simfile);
-    public function remove(Simfile $simfile);
+    public function save(ISimfile $entity);
+    public function remove(ISimfile $entity);
 }
+    

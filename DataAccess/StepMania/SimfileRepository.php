@@ -2,12 +2,12 @@
 
 namespace DataAccess\StepMania;
 
-use DataAccess\IRepository;
+use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\DataMapper\IDataMapper;
-use Domain\Entities\IDivineEntity;
+use Domain\Entities\StepMania\ISimfile;
 
 //TODO: Implement some sort of caching. Probably OK for now not to worry.
-class SimfileRepository implements IRepository
+class SimfileRepository implements ISimfileRepository
 {
     private $dataMapper;
     
@@ -16,15 +16,15 @@ class SimfileRepository implements IRepository
     }
     
     public function find($id) {
-        return $this->dataMapper->find($id, 'simfiles');
+        return $this->dataMapper->find($id, 'Simfile');
     }
     
-    public function save(IDivineEntity $entity) {
+    public function save(ISimfile $entity) {
         $this->dataMapper->save($entity);
     }
     
     //TODO: Implement
-    public function remove(IDivineEntity $entity) {
+    public function remove(ISimfile $entity) {
         ;
     }
 }

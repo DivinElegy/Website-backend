@@ -10,7 +10,7 @@ abstract class AbstractEntity implements IDivineEntity
     
     public function setId($id) {
         if(isset($this->id)) {
-        //    throw new Exception('ID already set.');
+            throw new Exception('ID already set.');
         }
         
         $this->id = $id;

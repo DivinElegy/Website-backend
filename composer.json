@@ -5,7 +5,9 @@
     "autoload": {
         "psr-0": {
             "Domain" : "./",
-            "DataAccess" : "./"
+            "DataAccess" : "./",
+            "Controllers" : "./",
+            "Services" : "./"
         },
         "files" : ["./DataAccess/functions.php"]
     }
