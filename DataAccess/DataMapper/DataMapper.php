@@ -15,7 +15,7 @@ class DataMapper implements IDataMapper
     
     public function __construct($maps)
     {
-        //should probably do all this through a configuration object or something
+        //TODO: should probably do all this through a configuration object or something
         $dsn = 'mysql:host=localhost;dbname=divinelegy;charset=utf8';
         $username = 'root';
         $password = 'toor';
@@ -100,6 +100,7 @@ class DataMapper implements IDataMapper
         echo '</pre>';
     }
     
+    //TODO: Implement
     public function remove(IDivineEntity $entity) {
         ;
     }
