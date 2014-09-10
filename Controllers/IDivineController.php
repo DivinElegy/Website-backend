@@ -4,6 +4,6 @@ namespace Controllers;
 
 interface IDivineController
 {
-    public function setJsonResponse();
+    public function setJsonResponse($bool);
     public function getAction();
 }

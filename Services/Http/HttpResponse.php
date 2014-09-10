@@ -1,8 +1,8 @@
 <?php
 
-namespace Services;
+namespace Services\Http;
 
-use Services\IHttpResponse;
+use Services\Http\IHttpResponse;
 use Exception;
 
 class HttpResponse implements IHttpResponse

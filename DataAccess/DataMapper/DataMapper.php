@@ -22,7 +22,7 @@ class DataMapper implements IDataMapper
         $options = array(PDO::ATTR_EMULATE_PREPARES => false,
                          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->_db = new PDO($dsn, $username, $password, $options);        
+        $this->_db = new PDO($dsn, $username, null, $options);        
         $this->_maps = include $maps;
     }
     
