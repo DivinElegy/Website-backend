@@ -18,9 +18,15 @@ $containerBuilder->useAutowiring(true);
 
 $container = $containerBuilder->build();
 
+$route = new Services\Routing\Route('swege', '/yolo/swage', array('GET'));
+$request = new Services\Http\HttpRequest();
 
-$indexController = $container->get('Controllers\IndexController');
-$indexController->getAction();
+$match = $route->matches($request->getPath());
+
+var_dump($route->supports('POST'));
+
+//$indexController = $container->get('Controllers\IndexController');
+//$indexController->getAction();
 
 /* @var $foo Domain\Entities\Foo */
 //$foo = $container->get('Domain\Entities\Foo');

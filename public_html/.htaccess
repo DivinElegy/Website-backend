@@ -1,0 +1,8 @@
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
+
+php_value auto_prepend_file /home/cameron/vhosts/xhprof/public_html/header.php
+php_value auto_append_file /home/cameron/vhosts/xhprof/public_html/footer.php
+

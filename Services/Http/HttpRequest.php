@@ -155,4 +155,33 @@ class HttpRequest implements IHttpRequest
     {
         return $_SERVER['HTTP_USER_AGENT'];
     }
+    
+    private function getPhysicalPath()
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME']; // <-- "/foo/index.php"
+        $requestUri = $_SERVER['REQUEST_URI']; // <-- "/foo/bar?test=abc" or "/foo/index.php/bar?test=abc"   
+        
+        // Physical path
+        if (strpos($requestUri, $scriptName) !== false) {
+            $physicalPath = $scriptName; // <-- Without rewriting
+        } else {
+            $physicalPath = str_replace('\\', '', dirname($scriptName)); // <-- With rewriting
+        }
+        
+        return $physicalPath;
+    }
+    
+    public function getPath()
+    {
+            $physicalPath = $this->getPhysicalPath();
+            $requestUri = $_SERVER['REQUEST_URI']; // <-- "/foo/bar?test=abc" or "/foo/index.php/bar?test=abc"   
+            $queryString = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ''; // <-- "test=abc" or ""
+
+            // Virtual path
+            $path = substr_replace($requestUri, '', 0, strlen($physicalPath)); // <-- Remove physical path
+            $path = str_replace('?' . $queryString, '', $path); // <-- Remove query string
+            $path = '/' . ltrim($path, '/'); // <-- Ensure leading slash
+            
+            return $path;
+    }
 }

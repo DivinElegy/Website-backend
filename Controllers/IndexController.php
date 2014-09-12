@@ -48,7 +48,7 @@ class IndexController extends AbstractBaseController implements IDivineControlle
 //        public function getReferer();
 //        public function getUserAgent();
         $r = $this->_request;
-//        echo $r->getMethod();
+        echo $r->getPath();
         
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody(json_encode(array('body' => $r->getBody())))

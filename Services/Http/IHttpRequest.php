@@ -23,4 +23,5 @@ interface IHttpRequest
     public function getReferrer();
     public function getReferer();
     public function getUserAgent();
+    public function getPath();
 }
