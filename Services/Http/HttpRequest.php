@@ -181,6 +181,7 @@ class HttpRequest implements IHttpRequest
             $path = substr_replace($requestUri, '', 0, strlen($physicalPath)); // <-- Remove physical path
             $path = str_replace('?' . $queryString, '', $path); // <-- Remove query string
             $path = '/' . ltrim($path, '/'); // <-- Ensure leading slash
+            $path = rtrim($path, '/'); // remove / from the end of string
             
             return $path;
     }
