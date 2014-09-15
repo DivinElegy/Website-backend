@@ -10,7 +10,6 @@ class Route implements IRoute
     private $_actionName;
     private $_pattern;
     private $_methods;
-    private $_actionArgs;
     private $_argNames;
     private $_argValues;
     
@@ -70,6 +69,10 @@ class Route implements IRoute
     
     public function getActionArgs()
     {
+        if(empty($this->_argNames)) {
+            return array();
+        }
+        
         $argValues = array();
         foreach($this->_argNames as $argName)
         {
