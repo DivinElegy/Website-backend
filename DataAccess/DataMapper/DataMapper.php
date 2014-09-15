@@ -22,7 +22,7 @@ class DataMapper implements IDataMapper
         $options = array(PDO::ATTR_EMULATE_PREPARES => false,
                          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->_db = new PDO($dsn, $username, null, $options);        
+        $this->_db = new PDO($dsn, $username, $password, $options);        
         $this->_maps = include $maps;
     }
     
@@ -32,21 +32,24 @@ class DataMapper implements IDataMapper
             $this->_maps[$entity]['table'],
             $id));
         $statement->execute();
-        $row = $statement->fetch();
-                
-        $className = $this->_maps[$entity]['class']; //the entity to instantiate and return
-        $constructors = AbstractPopulationHelper::getConstrutorArray($this->_maps, $entity, $row, $this->_db);
-                
-        if(count($constructors) == 0)
+        $rows = $statement->fetchAll();
+        
+        foreach($rows as $row)
         {
-            $class = new $className;            
-        } else {
-            $r = new ReflectionClass($className);
-            $class = $r->newInstanceArgs($constructors);
-        }
+            $className = $this->_maps[$entity]['class']; //the entity to instantiate and return
+            $constructors = AbstractPopulationHelper::getConstrutorArray($this->_maps, $entity, $row, $this->_db);
 
-        $class->setId($row['id']);
-        return $class;
+            if(count($constructors) == 0)
+            {
+                $class = new $className;            
+            } else {
+                $r = new ReflectionClass($className);
+                $class = $r->newInstanceArgs($constructors);
+            }
+
+            $class->setId($row['id']);
+            return $class;
+        }
     }
     
     public function save(IDivineEntity $entity)

@@ -26,7 +26,7 @@ class IndexController extends AbstractBaseController implements IDivineControlle
         $this->_simfileRepository = $repository;
     }
         
-    public function getAction() {
+    public function indexAction() {
         /* @var $simfile Domain\Entities\StepMania\ISimfile */
 //        public function getMethod();
 //        public function isGet();

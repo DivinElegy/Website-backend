@@ -2,15 +2,19 @@
 
 namespace Services\Routing;
 
-class Route
+use Services\Routing\IRoute;
+
+class Route implements IRoute
 {
     private $_controllerName;
+    private $_actionName;
     private $_pattern;
     private $_methods;
     
-    public function __construct($controllerName, $pattern, array $methods)
+    public function __construct($pattern, array $methods, $controllerName, $actionName = null)
     {
         $this->_controllerName = $controllerName;
+        $this->_actionName = $actionName;
         $this->_pattern = $pattern;
         $this->_methods = $methods;
     }
@@ -56,7 +60,12 @@ class Route
     
     public function getControllerName()
     {
-        $this->_controllerName;
+        return $this->_controllerName;
+    }
+    
+    public function getActionName()
+    {
+        return $this->_actionName;
     }
 }
 
