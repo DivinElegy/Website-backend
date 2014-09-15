@@ -13,6 +13,10 @@ $router = $container->get('Services\Routing\IRouter');
 
 $controllerName= $router->getControllerName();
 $controllerAction = $router->getActionName();
+$controllerActionArgs = $router->getActionArgs();
 
 $controller = $container->get('Controllers\\' . $controllerName . 'Controller' );
-$controller->{$controllerAction . 'Action'}();
+
+// Last thing to do, call the action on the specified controller.
+call_user_func(array($controller, $controllerAction . 'Action'), $controllerActionArgs);
+

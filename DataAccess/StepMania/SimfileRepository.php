@@ -19,6 +19,11 @@ class SimfileRepository implements ISimfileRepository
         return $this->dataMapper->find($id, 'Simfile');
     }
     
+    public function findRange($id, $limit)
+    {
+        return $this->dataMapper->findRange($id, 'Simfile', $limit);
+    }
+    
     public function save(ISimfile $entity) {
         $this->dataMapper->save($entity);
     }

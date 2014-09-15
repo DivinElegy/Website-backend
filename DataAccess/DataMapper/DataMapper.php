@@ -28,11 +28,19 @@ class DataMapper implements IDataMapper
     
     public function find($id, $entity)
     {
-        $statement = $this->_db->prepare(sprintf('SELECT * from %s WHERE id=%u',
+        return $this->findRange($id, $entity, 1);
+    }
+    
+    public function findRange($id, $entity, $limit)
+    {
+        $statement = $this->_db->prepare(sprintf('SELECT * from %s WHERE id>=%u LIMIT %u',
             $this->_maps[$entity]['table'],
-            $id));
+            $id,
+            $limit));
         $statement->execute();
         $rows = $statement->fetchAll();
+        
+        $entities = array();
         
         foreach($rows as $row)
         {
@@ -48,8 +56,10 @@ class DataMapper implements IDataMapper
             }
 
             $class->setId($row['id']);
-            return $class;
+            $entities[$row['id']] = $class;
         }
+        
+        return count($entities) > 1 ? $entities : reset($entities);
     }
     
     public function save(IDivineEntity $entity)

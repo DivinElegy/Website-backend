@@ -8,4 +8,5 @@ interface IRoute
     public function supports($method);
     public function getControllerName();
     public function getActionName();
+    public function getActionArgs();
 }

@@ -31,10 +31,23 @@ class SimfileController implements IDivineController
     public function listAction()
     {
         /* @var $simfile Domain\Entities\StepMania\ISimfile */
-        $simfile = $this->_simfileRepository->find(1);
+        $simfiles = $this->_simfileRepository->findRange(1, 10);
+        $returnArray = array();
+        
+        foreach($simfiles as $simfile)
+        {
+            $returnArray[$simfile->getTitle()] = array('artist' => $simfile->getArtist()->getName());
+        }
         
         $this->_response->setHeader('Content-Type', 'application/json')
-                        ->setBody(json_encode(array('artist' => $simfile->getArtist()->getName())))
+                        ->setBody(json_encode($returnArray))
+                        ->sendResponse();
+    }
+    
+    public function testAction($testArg)
+    {
+        $this->_response->setHeader('Content-Type', 'application/json')
+                        ->setBody(json_encode(array('testArg' => $testArg)))
                         ->sendResponse();
     }
 }

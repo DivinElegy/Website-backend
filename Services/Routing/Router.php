@@ -40,6 +40,12 @@ class Router implements IRouter
         return $matchedRoute ? $matchedRoute->getActionName() : 'index';
     }
     
+    public function getActionArgs()
+    {
+        $matchedRoute = $this->findMatch();
+        return $matchedRoute ? $matchedRoute->getActionArgs() : array() ;
+    }
+    
     private function findMatch()
     {
         if($this->_matchedRoute)
