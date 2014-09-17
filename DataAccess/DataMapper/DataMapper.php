@@ -26,17 +26,13 @@ class DataMapper implements IDataMapper
         $this->_maps = include $maps;
     }
     
-    public function find($id, $entity)
+    public function find($entityName, $queryString)
     {
-        return $this->findRange($id, $entity, 1);
-    }
-    
-    public function findRange($id, $entity, $limit)
-    {
-        $statement = $this->_db->prepare(sprintf('SELECT * from %s WHERE id>=%u LIMIT %u',
-            $this->_maps[$entity]['table'],
-            $id,
-            $limit));
+        $statement = $this->_db->prepare(sprintf('SELECT * from %s WHERE %s',
+            $this->_maps[$entityName]['table'],
+            $queryString
+        ));
+        
         $statement->execute();
         $rows = $statement->fetchAll();
         
@@ -44,8 +40,8 @@ class DataMapper implements IDataMapper
         
         foreach($rows as $row)
         {
-            $className = $this->_maps[$entity]['class']; //the entity to instantiate and return
-            $constructors = AbstractPopulationHelper::getConstrutorArray($this->_maps, $entity, $row, $this->_db);
+            $className = $this->_maps[$entityName]['class']; //the entity to instantiate and return
+            $constructors = AbstractPopulationHelper::getConstrutorArray($this->_maps, $entityName, $row, $this->_db);
 
             if(count($constructors) == 0)
             {
@@ -60,6 +56,20 @@ class DataMapper implements IDataMapper
         }
         
         return count($entities) > 1 ? $entities : reset($entities);
+        
+        return $this->findRange($id, $entityName, 1);
+    }
+    
+    public function findById($id, $entity)
+    {
+         $queryString = sprintf('id=%u', $id);
+         return $this->find($entity, $queryString);
+    }
+    
+    public function findRange($id, $entity, $limit)
+    {
+        $queryString = sprintf('id>=%u LIMIT %u', $id, $limit);
+        return $this->find($entity, $queryString);
     }
     
     public function save(IDivineEntity $entity)
