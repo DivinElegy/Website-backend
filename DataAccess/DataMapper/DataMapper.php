@@ -22,15 +22,14 @@ class DataMapper implements IDataMapper
         $options = array(PDO::ATTR_EMULATE_PREPARES => false,
                          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->_db = new PDO($dsn, $username, $password, $options);        
+        $this->_db = new PDO($dsn, $username, null, $options);        
         $this->_maps = include $maps;
     }
     
-    public function find($entityName, $queryString)
+    public function map($entityName, $queryString = 'SELECT * FROM %s')
     {
-        $statement = $this->_db->prepare(sprintf('SELECT * from %s WHERE %s',
-            $this->_maps[$entityName]['table'],
-            $queryString
+        $statement = $this->_db->prepare(sprintf($queryString,
+            $this->_maps[$entityName]['table']
         ));
         
         $statement->execute();
@@ -55,23 +54,9 @@ class DataMapper implements IDataMapper
             $entities[$row['id']] = $class;
         }
         
-        return count($entities) > 1 ? $entities : reset($entities);
+        return $entities;
+    }
         
-        return $this->findRange($id, $entityName, 1);
-    }
-    
-    public function findById($id, $entity)
-    {
-         $queryString = sprintf('id=%u', $id);
-         return $this->find($entity, $queryString);
-    }
-    
-    public function findRange($id, $entity, $limit)
-    {
-        $queryString = sprintf('id>=%u LIMIT %u', $id, $limit);
-        return $this->find($entity, $queryString);
-    }
-    
     public function save(IDivineEntity $entity)
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
