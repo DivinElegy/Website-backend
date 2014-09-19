@@ -4,6 +4,7 @@ namespace DataAccess\DataMapper;
 
 use Domain\Entities\IDivineEntity;
 use DataAccess\DataMapper\IDataMapper;
+use DataAccess\Queries\IQueryBuilder;
 use DataAccess\DataMapper\Helpers\AbstractPopulationHelper;
 use ReflectionClass;
 use PDO;
@@ -22,12 +23,14 @@ class DataMapper implements IDataMapper
         $options = array(PDO::ATTR_EMULATE_PREPARES => false,
                          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->_db = new PDO($dsn, $username, null, $options);        
+        $this->_db = new PDO($dsn, $username, $password, $options);        
         $this->_maps = include $maps;
     }
     
-    public function map($entityName, $queryString = 'SELECT * FROM %s')
+    public function map($entityName, IQueryBuilder $queryBuilder)
     {
+        $queryString = $queryBuilder->buildQuery();
+        
         $statement = $this->_db->prepare(sprintf($queryString,
             $this->_maps[$entityName]['table']
         ));

@@ -4,6 +4,7 @@ namespace DataAccess\StepMania;
 
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\DataMapper\IDataMapper;
+use DataAccess\Queries\IQueryBuilderFactory;
 use DataAccess\Queries\StepMania\ISimfileQueryConstraints;
 use Domain\Entities\StepMania\ISimfile;
 
@@ -11,9 +12,11 @@ use Domain\Entities\StepMania\ISimfile;
 class SimfileRepository implements ISimfileRepository
 {
     private $_dataMapper;
+    private $_queryBuilderFactory;
     
-    public function __construct(IDataMapper $dataMapper) {
+    public function __construct(IDataMapper $dataMapper, IQueryBuilderFactory $queryBuilderFactory) {
         $this->_dataMapper = $dataMapper;
+        $this->_queryBuilderFactory = $queryBuilderFactory;
     }
     
     public function findById($id) {
@@ -42,26 +45,15 @@ class SimfileRepository implements ISimfileRepository
     
     public function findByTitle($title, ISimfileQueryConstraints $constraints = NULL)
     {
-        //TODO: Should I inject a factory, and then make $constraints if it isn't given?
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('title', 'LIKE', "%%$title%%");
+        
         if($constraints)
         {
-            $queryString = $constraints->where('title', 'LIKE', "%%$title%%") //TODO: Should I make a like method that handles adding the %% ?
-                                       ->applyTo('SELECT * from %s');
-        } else {
-            //It would avoid this, or rather I could put this in the constraints class
-            $queryString = "SELECT * FROM %s WHERE title LIKE '%$title%'";
+            $constraints->applyTo($queryBuilder);
         }
-        
-        //is it better to pass in constraints object?
-        //could have a default "select * from %s" in the constraints object which could be overwritten via a method.
-        //-no more need for applyTo, just go $constratints->getQuery
-        //maybe it should no longer be constraints but instead queryBuilder
-        
-        /**
-         * have this class contain a queryBuilderFactory and then have constraintsClass 
-         * go in through methods which act on the query, adding in constraints.
-         */
-        return $this->_dataMapper->map('Simfile', $queryString);
+
+        return $this->_dataMapper->map('Simfile', $queryBuilder);
     }
     
     public function findByArtist($artist){}

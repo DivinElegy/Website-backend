@@ -18,5 +18,5 @@ return [
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),
     'DataAccess\DataMapper\IDataMapper' => DI\object('DataAccess\DataMapper\DataMapper')
         ->constructor(DI\link('datamapper.maps')),   
-   
+    'DataAccess\Queries\IQueryBuilderFactory' => DI\object('DataAccess\Queries\QueryBuilderFactory')
 ];
