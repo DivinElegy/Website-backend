@@ -2,3 +2,4 @@ nbproject
 logs
 composer.lock
 vendor
+db.php

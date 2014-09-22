@@ -14,8 +14,9 @@ class DataMapper implements IDataMapper
     private $_db;
     private $_maps;
     
-    public function __construct($maps)
+    public function __construct($maps, $dbCredentials)
     {
+        $credentials = include $dbCredentials;
         //TODO: should probably do all this through a configuration object or something
         $dsn = 'mysql:host=localhost;dbname=divinelegy;charset=utf8';
         $username = 'root';
@@ -23,7 +24,7 @@ class DataMapper implements IDataMapper
         $options = array(PDO::ATTR_EMULATE_PREPARES => false,
                          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
         
-        $this->_db = new PDO($dsn, $username, $password, $options);        
+        $this->_db = new PDO($dsn, $credentials['user'], $credentials['pass'], $options);        
         $this->_maps = include $maps;
     }
     
