@@ -2,6 +2,7 @@
 
 return [
     'user' => 'username',
-    'pass' => 'password'
+    'pass' => 'password',
+    'database' => 'my_db'
 ];
 
