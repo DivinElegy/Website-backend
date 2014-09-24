@@ -3,28 +3,20 @@
 namespace DataAccess\DataMapper;
 
 use Domain\Entities\IDivineEntity;
+use DataAccess\IDatabaseFactory;
 use DataAccess\DataMapper\IDataMapper;
 use DataAccess\Queries\IQueryBuilder;
 use DataAccess\DataMapper\Helpers\AbstractPopulationHelper;
 use ReflectionClass;
-use PDO;
 
 class DataMapper implements IDataMapper
 {
     private $_db;
     private $_maps;
     
-    public function __construct($maps, $dbCredentials)
+    public function __construct($maps, IDatabaseFactory $databaseFactory)
     {
-        $credentials = include $dbCredentials;
-        //TODO: should probably do all this through a configuration object or something
-        $dsn = 'mysql:host=localhost;dbname=divinelegy;charset=utf8';
-        $username = 'root';
-        $password = 'toor';
-        $options = array(PDO::ATTR_EMULATE_PREPARES => false,
-                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-        
-        $this->_db = new PDO($dsn, $credentials['user'], $credentials['pass'], $options);        
+        $this->_db = $databaseFactory->createInstance();        
         $this->_maps = include $maps;
     }
     

@@ -17,7 +17,9 @@ return [
     
     //DA
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),
+    'DataAccess\IDatabaseFactory' => DI\object('DataAccess\DatabaseFactory')
+        ->constructor(DI\link('db.credentials')),
     'DataAccess\DataMapper\IDataMapper' => DI\object('DataAccess\DataMapper\DataMapper')
-        ->constructor(DI\link('datamapper.maps'), DI\link('db.credentials')),
+        ->constructor(DI\link('datamapper.maps')),
     'DataAccess\Queries\IQueryBuilderFactory' => DI\object('DataAccess\Queries\QueryBuilderFactory')
 ];

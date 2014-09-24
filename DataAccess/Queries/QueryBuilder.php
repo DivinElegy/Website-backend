@@ -10,11 +10,11 @@ class QueryBuilder implements IQueryBuilder
     
     protected $_whereClauses = array();
     protected $_limitClause;
-    protected $_joinClause;
+    protected $_joinClauses = array();
     
     public function buildQuery()
     {        
-        $this->applyJoinClause()
+        $this->applyJoinClauses()
              ->applyWhereClauses()
              ->applyLimitClause();
         
@@ -47,13 +47,17 @@ class QueryBuilder implements IQueryBuilder
     
     public function join($type, $tableA, $columnA, $tableB, $columnB)
     {
-        $this->_joinClause = sprintf(' %s JOIN %s ON %s.%s = %s.%s', $type, $tableB, $tableA, $columnA, $tableB, $columnB);
+        $this->_joinClauses[] = sprintf(' %s JOIN %s ON %s.%s = %s.%s', $type, $tableB, $tableA, $columnA, $tableB, $columnB);
         return $this;
     }
     
-    private function applyJoinClause()
+    private function applyJoinClauses()
     {
-        $this->_queryString .= $this->_joinClause;
+        foreach($this->_joinClauses as $joinClause)
+        {
+            $this->_queryString .= $joinClause;
+        }
+        
         return $this;
     }
     
