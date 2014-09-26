@@ -14,6 +14,8 @@ return [
     'Services\Http\IHttpRequest' => DI\object('Services\Http\HttpRequest'),
     'Services\Routing\IRouter' => DI\object('Services\Routing\Router')
         ->constructor(DI\link('router.maps')),
+    'Services\Uploads\IUploadManager' => DI\object('Services\Uploads\UploadManager'),
+    'Services\Uploads\IFileFactory' => DI\object('Services\Uploads\FileFactory'),
     
     //DA
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),

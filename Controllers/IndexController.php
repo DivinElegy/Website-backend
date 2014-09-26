@@ -28,7 +28,7 @@ class IndexController implements IDivineController
         $queryConstraints = new SimfileQueryConstraints();
         $queryConstraints->stepsHaveRating(15);
 
-        $simfiles = $this->_simfileRepository->findByTitle('a');
+        $simfiles = $this->_simfileRepository->findByBeginnerMeter(2);
 
         foreach($simfiles as $simfile)
         {

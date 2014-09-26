@@ -1,4 +1,8 @@
 <?php
+
+//TODO: Config this
+header("Access-Control-Allow-Origin: http://172.17.12.110:8000");
+
 require_once('../vendor/autoload.php');
 
 // Set up the DI container

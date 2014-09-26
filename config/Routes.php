@@ -7,6 +7,12 @@ return [
         'action' => 'list'
     ],
     
+    '/simfiles/upload' => [
+        'methods' => ['POST'],
+        'controller' => 'Simfile',
+        'action' => 'upload'
+    ],
+        
     '/simfiles/argTest/:testarg' => [
         'methods' => ['GET'],
         'controller' => 'Simfile',
