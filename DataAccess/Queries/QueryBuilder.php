@@ -17,7 +17,7 @@ class QueryBuilder implements IQueryBuilder
         $this->applyJoinClauses()
              ->applyWhereClauses()
              ->applyLimitClause();
-        
+
         return $this->_queryString;
     }
     

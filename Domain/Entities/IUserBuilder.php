@@ -11,6 +11,7 @@ interface IUserBuilder
     public function With_DisplayName($name);
     public function With_Name(IName $name);
     public function With_Tags(array $tags);
+    public function With_FacebookId($id);
     public function With_YearsStepArtist($years);
     public function build();
 }

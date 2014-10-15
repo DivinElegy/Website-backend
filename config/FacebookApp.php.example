@@ -1,0 +1,7 @@
+<?php
+
+return [
+    'appId' => 'id',
+    'appSecret' => 'secret'
+];
+

@@ -3,8 +3,7 @@
 namespace Domain\Entities;
 
 use Domain\VOs\ICountry;
-use Domain\Vos\IName;
-use Domain\Entities\IUser;
+use Domain\VOs\IName;
 
 interface IUserStepByStepBuilder
 {
@@ -27,6 +26,11 @@ interface IUserStepByStepBuilder_With_Name
 }
 
 interface IUserStepByStepBuilder_With_Tags
+{
+    public function With_FacebookId($id);
+}
+
+interface IUserStepByStepBuilder_With_FacebookId
 {
     public function With_YearsStepArtist($years); //not going to make this mandatory as it is kind of a joke
     public function build();
@@ -75,6 +79,14 @@ class UserStepByStepBuilder_With_Name extends AbstractUserStepByStepBuilder impl
 }
 
 class UserStepByStepBuilder_With_Tags extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder_With_Tags
+{
+    public function With_FacebookId($id) {
+        $this->_userBuilder->With_FacebookId($id);
+        return new UserStepByStepBuilder_With_FacebookId($this->_userBuilder);
+    }
+}
+
+class UserStepByStepBuilder_With_FacebookId extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder_With_FacebookId
 {
     public function With_YearsStepArtist($years) {
         $this->_userBuilder->With_YearsStepArtist($years);

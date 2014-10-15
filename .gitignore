@@ -4,3 +4,4 @@ composer.lock
 vendor
 db.php
 files
+FacebookApp.php

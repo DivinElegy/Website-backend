@@ -17,5 +17,10 @@ return [
         'methods' => ['GET'],
         'controller' => 'Simfile',
         'action' => 'test'
+    ],
+    
+    '/user/auth' => [
+        'method' => ['GET'],
+        'controller' => 'UserAuth'
     ]
 ];

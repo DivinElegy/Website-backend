@@ -41,7 +41,7 @@ class AbstractPopulationHelper
     static function generateUpdateSaveQuery($maps, $entity, $id, $db, &$queries = array(), $extraColumns = array())
     {
         $entityMapsIndex = self::getMapsNameFromEntityObject($entity, $maps);
-        
+
         if($id)
         {
             $query = sprintf('update %s set ', $maps[$entityMapsIndex]['table']);    
@@ -113,8 +113,6 @@ class AbstractPopulationHelper
 
                             break;
                         case self::REFERENCE_BACK:
-                            echo 'bleh';
-
                             $voId = self::findVOInDB($maps,
                                 $property,
                                 $db,
@@ -221,10 +219,11 @@ class AbstractPopulationHelper
                 // in the case of setting up a new entity, the VOs should never
                 // exist in the first place, so we just make them.
                 case 'DataAccess\DataMapper\Helpers\VOArrayMapsHelper':
-                    if($id)
+                    if($id && isset($property[0]))
                     {
                         // If we assume that all elements in the array are the same then
                         // we can just use the first one to figure out which maps entry to use
+                        
                         $subEntityMapsIndex = self::getMapsNameFromEntityObject($property[0], $maps);
                         $voIds = self::mapVOArrayToIds($maps[$subEntityMapsIndex]['table'],
                             array(strtolower($entityMapsIndex . '_id'), $id),
@@ -254,22 +253,32 @@ class AbstractPopulationHelper
                     }
             }
         }
+//        
+//        if($id)
+//        {
+//            $query = substr($query, 0, -2);
+//            $query .= sprintf(' WHERE id=%u', $id);
+//            $queries['TYPE'] = self::QUERY_TYPE_UPDATE;
+//        } else {
+//            $queryColumnNamesAndValues = array_merge($queryColumnNamesAndValues, $extraColumns);
+//            $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
+//                $maps[$entityMapsIndex]['table'],
+//                implode(', ', array_keys($queryColumnNamesAndValues)),
+//                implode(', ', $queryColumnNamesAndValues));
+//            $queries['TYPE'] = self::QUERY_TYPE_CREATE;
+//        }
+//        print_r($queryColumnNamesAndValues);
+//        echo '<br />';
         
         if($id)
         {
-            $query = substr($query, 0, -2);
-            $query .= sprintf(' WHERE id=%u', $id);
-            $queries['TYPE'] = self::QUERY_TYPE_UPDATE;
+            $queryColumnNamesAndValues = @$queryColumnNamesAndValues ?: array();
+            $queries[] = array('id' => $id, 'prepared' => $query, 'table' => $maps[$entityMapsIndex]['table'], 'columns' => $queryColumnNamesAndValues);
         } else {
             $queryColumnNamesAndValues = array_merge($queryColumnNamesAndValues, $extraColumns);
-            $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
-                $maps[$entityMapsIndex]['table'],
-                implode(', ', array_keys($queryColumnNamesAndValues)),
-                implode(', ', $queryColumnNamesAndValues));
-            $queries['TYPE'] = self::QUERY_TYPE_CREATE;
+            $queries[] = array('table' => $maps[$entityMapsIndex]['table'], 'columns' => $queryColumnNamesAndValues);
         }
-        
-        $queries[] = $query;
+            
         return $queries;
     }
     

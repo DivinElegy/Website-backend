@@ -49,7 +49,7 @@ class DataMapper implements IDataMapper
             $class->setId($row['id']);
             $entities[$row['id']] = $class;
         }
-        
+
         return $entities;
     }
         
@@ -57,9 +57,53 @@ class DataMapper implements IDataMapper
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
         
+        $flattened = array();
+        $flattened_tables = array();
+        foreach($queries as $index => $query)
+        {
+            $this_table = $query['table'];
+            $this_columns = $query['columns'];
+            $add = false;
+            
+            for($i = $index+1; $i<count($queries); $i++)
+            {
+                if($queries[$i]['table'] == $this_table && !in_array($queries[$i]['table'], $flattened_tables) && isset($query['id'])) //only merge create queries, updates are fine to run multiple times
+                {
+                    $this_columns = array_merge($this_columns, $queries[$i]['columns']);
+                    $add = true;
+                }
+            }
+            
+            if(!in_array($this_table, $flattened_tables))
+            {
+                $flattened_tables[] = $this_table;
+                $prepared = isset($query['prepared']) ? $query['prepared'] : null;
+                $id = isset($query['id']) ? $query['id'] : null;
+                $flattened[] = array('columns' => $this_columns, 'table' => $this_table, 'prepared' => $prepared, 'id' => $id);
+            }
+        }
+        
+        $queries = array();
+        
+        foreach($flattened as $info)
+        {
+            if(isset($info['id']))
+            {
+                $query = $info['prepared'];
+                $query = substr($query, 0, -2);
+                $query .= sprintf(' WHERE id=%u', $info['id']);
+            } else {
+                $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
+                $info['table'],
+                implode(', ', array_keys($info['columns'])),
+                implode(', ', $info['columns']));
+            }
+            
+            $queries[] = $query;
+        }
+        
        // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)
        // {
-            unset($queries['TYPE']);
             $idMap = [];
             foreach($queries as $index => $query)
             {                                
@@ -98,10 +142,6 @@ class DataMapper implements IDataMapper
                 $statement->execute();
             }
         //}
-        
-        echo '<pre>';
-        print_r($queries);
-        echo '</pre>';
     }
     
     //TODO: Implement

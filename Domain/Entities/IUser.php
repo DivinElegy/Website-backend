@@ -11,4 +11,8 @@ interface IUser
     public function getCountry();
     public function getDisplayName();
     public function getYearsStepArtist();
+    public function getFacebookId();
+    public function setFacebookId($id);
+    public function getAuthToken();
+    public function setAuthToken($token);
 }
