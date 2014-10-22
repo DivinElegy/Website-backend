@@ -6,16 +6,19 @@ use DataAccess\IUserRepository;
 use DataAccess\DataMapper\IDataMapper;
 use Domain\Entities\IUser;
 use DataAccess\Queries\IQueryBuilderFactory;
+use Services\IFacebookSessionFactory;
 
 //TODO: Implement some sort of caching. Probably OK for now not to worry.
 class UserRepository implements IUserRepository
 {
     private $_dataMapper;
     private $_queryBuilderFactory;
+    private $_facebookSessionFactory;
     
-    public function __construct(IDataMapper $dataMapper, IQueryBuilderFactory $queryBuilderFactory) {
+    public function __construct(IDataMapper $dataMapper, IQueryBuilderFactory $queryBuilderFactory, IFacebookSessionFactory $faceBookSessionFactory) {
         $this->_dataMapper = $dataMapper;
         $this->_queryBuilderFactory = $queryBuilderFactory;
+        $this->_facebookSessionFactory = $faceBookSessionFactory;
     }
     
     public function findById($id) {
@@ -49,10 +52,10 @@ class UserRepository implements IUserRepository
     }
     
     public function findByAuthToken($token) {
-        return $this->_dataMapper->map(
-            'User',
-            'SELECT * FROM %s WHERE auth_token=' . $token
-        );
+        $facebookSession = $this->_facebookSessionFactory->createInstance($token);
+        $id = $facebookSession->getGraphObject(GraphUser::className())->getId();
+        
+        return $this->findByFacebookId($id);
     }
     
     public function save(IUser $entity) {

@@ -53,8 +53,6 @@ class UserAuthController implements IDivineController
         
         // If the user is not in the DB, create them.
         $user = $this->_userRepository->findByFacebookId($id) ?: $this->registerUser();
-        // Update stored auth token if needed.
-        $this->updateAuthToken($user);
 
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody(json_encode(array('token' => $this->_facebookSession->getToken(), 'expires' => $this->getSessionExpiryTimestamp($this->_facebookSession), 'displayName' => $user->getDisplayName())))
@@ -102,15 +100,6 @@ class UserAuthController implements IDivineController
         $this->_userRepository->save($newUser);
         
         return $newUser;
-    }
-    
-    private function updateAuthToken(IUser $user)
-    {
-        if($user->getAuthToken() != $this->_facebookSession->getToken())
-        {
-            $user->setAuthToken($this->_facebookSession->getToken());
-            $this->_userRepository->save($user);
-        }
     }
     
     private function isSessionLongLived(FacebookSession $session)

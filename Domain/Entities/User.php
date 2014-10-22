@@ -9,29 +9,25 @@ use Domain\VOs\IName;
 
 class User extends AbstractEntity implements IUser
 {
-    private $_id;
     private $_country;
     private $_displayName;
     private $_name;
     private $_tags;
     private $_yearsStepArtist;
     private $_facebookId;
-    private $_authToken;
     
     public function __construct(
         ICountry $country,
         $displayName,
         IName $name,
         array $tags,
-        $facebookId,
-        $authToken = null
+        $facebookId
     ) {
         $this->_country = $country;
         $this->_displayName = $displayName;
         $this->_name = $name;
         $this->_tags = $tags;
         $this->_facebookId = $facebookId;
-        $this->_authToken = $authToken;
     }
         
     public function getCountry() {
@@ -58,16 +54,6 @@ class User extends AbstractEntity implements IUser
     public function setFacebookId($id)
     {
         $this->_facebookId = $id;
-    }
-    
-    public function getAuthToken()
-    {
-        return $this->_authToken;
-    }
-    
-    public function setAuthToken($token)
-    {
-        $this->_authToken = $token;
     }
     
     public function getYearsStepArtist() {

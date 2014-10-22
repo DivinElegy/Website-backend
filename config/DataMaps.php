@@ -41,8 +41,7 @@ return [
             'displayName' => DataAccess\Varchar('display_name'),
             'name' => DataAccess\VO('Name'),
             'tags' => DataAccess\VOArray('Tag', 'getTags'), // TODO: Make VarcharArray class
-            'facebookId' => DataAccess\Varchar('facebook_id'),
-            'authToken' => DataAccess\Varchar('auth_token')
+            'facebookId' => DataAccess\Varchar('facebook_id')
         ]
     ],
     

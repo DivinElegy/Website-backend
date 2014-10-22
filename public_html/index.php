@@ -23,5 +23,5 @@ $controllerActionArgs = $router->getActionArgs();
 $controller = $container->get('Controllers\\' . ucfirst($controllerName) . 'Controller' );
 
 // Last thing to do, call the action on the specified controller.
-call_user_func(array($controller, $controllerAction . 'Action'), $controllerActionArgs);
+call_user_func_array(array($controller, $controllerAction . 'Action'), $controllerActionArgs);
 

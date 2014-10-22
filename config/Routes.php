@@ -22,5 +22,11 @@ return [
     '/user/auth' => [
         'method' => ['GET'],
         'controller' => 'UserAuth'
+    ],
+    
+    '/user/:facebookId' => [
+        'method' => ['GET'],
+        'controller' => 'User',
+        'action' => 'getUser'
     ]
 ];
