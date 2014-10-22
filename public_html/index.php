@@ -3,6 +3,7 @@
 //TODO: Config this
 header("Access-Control-Allow-Origin: http://172.17.12.110:8000");
 header("Access-Control-Allow-Origin: http://roll.divinelegy.meeples:8000");
+header("Access-Control-Allow-Origin: http://roll.divinelegy.dev:8000");
 
 require_once('../vendor/autoload.php');
 

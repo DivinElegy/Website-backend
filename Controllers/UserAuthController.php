@@ -48,7 +48,7 @@ class UserAuthController implements IDivineController
         
         $this->_facebookSession = $this->isSessionLongLived($facebookSession) ? $facebookSession->getLongLivedSession() : $facebookSession;
         $this->_facebookRequest = (new FacebookRequest($this->_facebookSession, 'GET', '/me?fields=hometown,first_name,last_name'))->execute();
-        
+
         $id = $this->_facebookRequest->getGraphObject(GraphUser::className())->getId();
         
         // If the user is not in the DB, create them.
@@ -77,7 +77,7 @@ class UserAuthController implements IDivineController
     private function registerUser()
     {
         $userProfile = $this->_facebookRequest->getGraphObject(GraphUser::className());    
-        
+
         $homeTownPageId = $userProfile->getProperty('hometown')->getProperty('id');
         $pageRequest = (new FacebookRequest($this->_facebookSession, 'GET', '/' . $homeTownPageId ))->execute();
         $pageLocation = $pageRequest->getGraphObject(GraphLocation::className())->getProperty('location')->cast(GraphLocation::className());
@@ -86,7 +86,7 @@ class UserAuthController implements IDivineController
         $firstName = $userProfile->getFirstName();
         $lastName = $userProfile->getLastName();
         $facebookId = $userProfile->getId();
-        
+
         //TODO: Is insantiating the VO classes here a good idea?
         $newUser = $this->_userStepByStepBuilder->With_Country(new \Domain\VOs\Country($country))
                                                 ->With_DisplayName($firstName)
@@ -94,11 +94,9 @@ class UserAuthController implements IDivineController
                                                 ->With_Tags(array())
                                                 ->With_FacebookId($facebookId)
                                                 ->build();
-        
-        $newUser->setAuthToken($this->_facebookSession->getToken());
-        
+                
         $this->_userRepository->save($newUser);
-        
+
         return $newUser;
     }
     

@@ -56,21 +56,19 @@ class DataMapper implements IDataMapper
     public function save(IDivineEntity $entity)
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
-        
+
         $flattened = array();
         $flattened_tables = array();
         foreach($queries as $index => $query)
         {
             $this_table = $query['table'];
             $this_columns = $query['columns'];
-            $add = false;
             
             for($i = $index+1; $i<count($queries); $i++)
             {
-                if($queries[$i]['table'] == $this_table && !in_array($queries[$i]['table'], $flattened_tables) && isset($query['id'])) //only merge create queries, updates are fine to run multiple times
+                if($queries[$i]['table'] == $this_table && !in_array($queries[$i]['table'], $flattened_tables) && !isset($query['id'])) //only merge create queries, updates are fine to run multiple times
                 {
                     $this_columns = array_merge($this_columns, $queries[$i]['columns']);
-                    $add = true;
                 }
             }
             
