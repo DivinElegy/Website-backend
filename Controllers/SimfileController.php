@@ -40,7 +40,10 @@ class SimfileController implements IDivineController
         
         foreach($simfiles as $simfile)
         {
-            $returnArray[$simfile->getTitle()] = array('artist' => $simfile->getArtist()->getName());
+            $returnArray[] = array(
+                'artist' => $simfile->getArtist()->getName(),
+                'title' => $simfile->getTitle()
+            );
         }
         
         $this->_response->setHeader('Content-Type', 'application/json')

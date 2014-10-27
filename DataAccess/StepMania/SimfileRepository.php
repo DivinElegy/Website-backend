@@ -21,18 +21,18 @@ class SimfileRepository implements ISimfileRepository
     }
     
     public function findById($id) {
-        return $this->_dataMapper->map(
-            'Simfile',
-            'SELECT * FROM %s WHERE id=' . $id
-        );
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('id', '=', $id);
+                
+        return $this->_dataMapper->map('Simfile', $queryBuilder);
     }
     
     public function findRange($id, $limit)
     {
-        return $this->_dataMapper->findRange(
-            'Simfile',
-            'SELECT * FROM %s WHERE id>=' . $id . ' LIMIT ' . $limit
-        );
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('id', '>=', $id)->limit($limit);
+                
+        return $this->_dataMapper->map('Simfile', $queryBuilder);
     }
     
     public function save(ISimfile $entity) {
