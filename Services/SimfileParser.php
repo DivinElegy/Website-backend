@@ -20,6 +20,7 @@ class SimfileParser implements ISimfileParser
         
     public function __construct($simfileData)
     {
+        //XXX: Should I explode on ';' instead? That seems like it might be a more reliable delimiter
         $this->_smFileLines = explode("\n", $simfileData);
     }
     
