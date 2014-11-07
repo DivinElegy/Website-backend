@@ -20,6 +20,7 @@ return [
             'stops' => DataAccess\Int('stops', 'hasStops'),
             'fgChanges' => DataAccess\Int('fg_changes', 'hasFgChanges'),
             'bgChanges' => DataAccess\Int('bg_changes', 'hasBgChanges'),
+            'banner' => DataAccess\Entity('File', 'getBanner', 'banner_file'),
             'steps' => DataAccess\VOArray('StepChart', 'getSteps')
         ]
     ],
@@ -110,6 +111,20 @@ return [
         'table' => 'steps',
         'maps' => [
             'stepManiaName' => DataAccess\Varchar('difficulty', 'getStepManiaName')
+        ]
+    ],
+    
+    'File' => [
+        'class' => 'Domain\Entities\File',
+        'table' => 'files',
+        'maps' => [
+            'hash' => DataAccess\Varchar('hash'),
+            'path' => DataAccess\Varchar('path'),
+            'filename' => DataAccess\Varchar('filename'),
+            'mimetype' => DataAccess\Varchar('mimetype'),
+            'size' => DataAccess\Int('size'),
+            //TODO: actually this is stored as a datetime, might need datetime helper for stuff
+            'uploadDate' => DataAccess\Varchar('uploaded')
         ]
     ]
 ];

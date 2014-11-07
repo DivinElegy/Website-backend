@@ -28,5 +28,11 @@ return [
         'method' => ['GET'],
         'controller' => 'User',
         'action' => 'getUser'
+    ],
+    
+    '/files/banner/:hash' => [
+        'method' => ['GET'],
+        'controller' => 'File',
+        'action' => 'serveBanner'
     ]
 ];

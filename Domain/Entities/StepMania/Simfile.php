@@ -9,6 +9,7 @@ use Domain\ConstantsAndTypes\SIMFILE_CONSTANT;
 use Domain\Exception\InvalidStepChartException;
 use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IUser;
+use Domain\Entities\IFile;
 use Domain\Entities\AbstractEntity;
 
 class Simfile extends AbstractEntity implements ISimfile
@@ -21,6 +22,7 @@ class Simfile extends AbstractEntity implements ISimfile
     private $_stops = false;
     private $_fgChanges = false;
     private $_bgChanges = false;
+    private $_banner;
     private $_steps;
     
     public function __construct(
@@ -32,6 +34,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $stops,
         $fgChanges,
         $bgChanges,
+        IFile $banner = null,
         array $steps
     ) {
         $this->_title = $title;
@@ -42,6 +45,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $this->_stops = $stops;
         $this->_fgChanges = $fgChanges;
         $this->_bgChanges = $bgChanges;
+        $this->_banner = $banner;
 
         foreach($steps as $stepChart) {
             if(!$stepChart instanceof IStepChart) {
@@ -94,6 +98,11 @@ class Simfile extends AbstractEntity implements ISimfile
     
     public function addStepChart(IStepChart $stepChart) {
         $this->_steps[] = $stepChart;
+    }
+    
+    public function getBanner()
+    {
+        return $this->_banner;
     }
     
     public function getSteps()

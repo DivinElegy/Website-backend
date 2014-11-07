@@ -26,6 +26,7 @@ return [
     //DA
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),
     'DataAccess\IUserRepository' => DI\object('DataAccess\UserRepository'),
+    'DataAccess\IFileRepository' => DI\object('DataAccess\FileRepository'),
     'DataAccess\IDatabaseFactory' => DI\object('DataAccess\DatabaseFactory')
         ->constructor(DI\link('db.credentials')),
     'DataAccess\DataMapper\IDataMapper' => DI\object('DataAccess\DataMapper\DataMapper')

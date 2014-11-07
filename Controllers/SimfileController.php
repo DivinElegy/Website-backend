@@ -40,9 +40,36 @@ class SimfileController implements IDivineController
         
         foreach($simfiles as $simfile)
         {
+            $singleSteps = array();
+            $doubleSteps = array();
+            
+            foreach($simfile->getSteps() as $steps)
+            {   
+                $stepDetails = array(
+                    'artist' => $steps->getArtist()->getTag(),
+                    'difficulty' => $steps->getDifficulty()->getITGName(),
+                    'rating' => $steps->getRating()
+                );
+                
+                if($steps->getMode()->getPrettyName() == 'Single')
+                {
+                    $singleSteps[] = $stepDetails;
+                } else {
+                    $doubleSteps[] = $stepDetails;
+                }
+            }
+
             $returnArray[] = array(
+                'title' => $simfile->getTitle(),
                 'artist' => $simfile->getArtist()->getName(),
-                'title' => $simfile->getTitle()
+                'steps' => array(
+                    'single' => $singleSteps,
+                    'double' => $doubleSteps
+                ),
+                'bgChanges' => $simfile->hasBgChanges() ? 'Yes' : 'No',
+                'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
+                'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
+                'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default'
             );
         }
         
@@ -58,6 +85,8 @@ class SimfileController implements IDivineController
         //TODO: Put directory in config ?
         $filenames = $this->_uploadManager->setDestination('../files/StepMania/')
                                           ->process();
+        
+        //parse .sm files and save to DB. should use SimfileParser service
         
         echo '<pre>';
         print_r($filenames);

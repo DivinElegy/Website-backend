@@ -7,7 +7,6 @@ use Domain\Entities\IUser;
 
 interface IUserRepository extends IRepository
 {
-    public function findById($id);
     public function findByAuthToken($token);
     public function findByFacebookId($id);
     public function save(IUser $entity);

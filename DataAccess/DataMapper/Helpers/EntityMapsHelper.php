@@ -48,7 +48,7 @@ class EntityMapsHelper
     {
         $className = $maps[$this->_entityName]['class'];
         $table = $maps[$this->_entityName]['table'];
-
+        
         // If the table we already have contains the id of a row we need in
         // another table
         if(isset($row[$this->_tableName . '_id'])) {
@@ -58,8 +58,10 @@ class EntityMapsHelper
                 $join_id));
             $statement->execute();
             $row = $statement->fetch();
+        } else {
+            return null;
         }
-        
+
         $constructors = AbstractPopulationHelper::getConstrutorArray($maps, $this->_entityName, $row, $db);
 
         if(count($constructors) == 0)
