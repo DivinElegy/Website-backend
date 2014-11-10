@@ -2,11 +2,16 @@
 
 namespace Controllers;
 
+use ZipArchive;
+use Exception;
 use Controllers\IDivineController;
 use Services\Http\IHttpRequest;
 use Services\Http\IHttpResponse;
 use Services\Uploads\IUploadManager;
+use Services\ISimfileParser;
 use DataAccess\StepMania\ISimfileRepository;
+use DataAccess\IUserRepository;
+use Domain\Entities\StepMania\ISimfileStepByStepBuilder;
 
 class SimfileController implements IDivineController
 {
@@ -14,17 +19,26 @@ class SimfileController implements IDivineController
     private $_response;
     private $_request;
     private $_uploadManager;
+    private $_simfileParser;
+    private $_simfileBuilder;
+    private $_userRepository;
     
     public function __construct(
         IHttpRequest $request,
         IHttpResponse $response,
         IUploadManager $uploadManager,
-        ISimfileRepository $repository
+        ISimfileRepository $repository,
+        IUserRepository $userRepository,
+        ISimfileParser $simfileParser,
+        ISimfileStepByStepBuilder $simfileBuilder
     ) {
         $this->_request = $request;
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
         $this->_simfileRepository = $repository;
+        $this->_userRepository = $userRepository;
+        $this->_simfileParser = $simfileParser;
+        $this->_simfileBuilder = $simfileBuilder;
     }
     
     public function indexAction() {
@@ -81,22 +95,52 @@ class SimfileController implements IDivineController
     public function uploadAction()
     {        
         //logic for if pack or individual file
-        
+        $request = $this->_request->post();
+        //XXX: Could be a place UserService could look for token ?
+        $token = $request['token'];
+                
         //TODO: Put directory in config ?
         $filenames = $this->_uploadManager->setDestination('../files/StepMania/')
                                           ->process();
         
-        //parse .sm files and save to DB. should use SimfileParser service
-        
-        echo '<pre>';
         print_r($filenames);
-        echo '</pre>';
-    }
-    
-    public function testAction($testArg)
-    {
-        $this->_response->setHeader('Content-Type', 'application/json')
-                        ->setBody(json_encode(array('testArg' => $testArg)))
-                        ->sendResponse();
+        foreach($filenames as $filename => $hash)
+        {
+            $za = new ZipArchive();
+            //XXX: We assume all files are zips. Should be enforced by validation elsewhere.
+            $res = $za->open('../files/StepMania/' . $hash . '.zip');
+            
+            if($res !== true) throw new Exception ('Could not open zip for reading.');
+            
+            for($i=0; $i<$za->numFiles; $i++)
+            {
+                $stat = $za->statIndex($i);
+                if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
+                {
+                    $smData = file_get_contents('zip://../files/StepMania/' . $hash . '.zip#' . $stat['name']);
+                    break;
+                }
+            }
+        }
+        
+        if(!$smData) throw new Exception('Could not extract simfile.');
+        
+        /* @var $parser \Services\ISimfileParser */
+        $parser = $this->_simfileParser;
+        $parser->parse($smData);
+
+        //TODO: Instantiating VOs like this bad ?
+        $this->_simfileBuilder->With_Title($parser->title())
+                              ->With_Artist(new \Domain\VOs\StepMania\Artist($parser->artist()))
+                              ->With_Uploader($this->_userRepository->findByAuthToken($token)) //obj
+                              ->With_BPM($bpm) //obj
+                              ->With_BpmChanges($parser->bpmChanges())
+                              ->With_Stops($parser->stops())
+                              ->With_FgChanges($parser->fgChanges())
+                              ->With_BgChanges($parser->bgChanges())
+                              ->With_Steps($steps) //obj
+                              ->build();
+
+        //parse .sm files and save to DB. should use SimfileParser service
     }
 }

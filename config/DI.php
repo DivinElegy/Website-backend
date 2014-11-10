@@ -12,6 +12,9 @@ return [
     'Domain\Entities\IUserStepByStepBuilder' => DI\object('Domain\Entities\UserStepByStepBuilder'),
     'Domain\Entities\IUserBuilder' => DI\object('Domain\Entities\UserBuilder'),
     'Domain\Entities\IUserFactory' => DI\object('Domain\Entities\UserFactory'),
+    'Domain\Entities\StepMania\ISimfileStepByStepBuilder' => DI\object('Domain\Entities\StepMania\SimfileStepByStepBuilder'),
+    'Domain\Entities\StepMania\ISimfileBuilder' => DI\object('Domain\Entities\StepMania\SimfileBuilder'),
+    'Domain\Entities\StepMania\ISimfileFactory' => DI\object('Domain\Entities\StepMania\SimfileFactory'),
     
     //services
     'Services\Http\IHttpResponse' => DI\object('Services\Http\HttpResponse'),
@@ -22,6 +25,7 @@ return [
     'Services\Uploads\IFileFactory' => DI\object('Services\Uploads\FileFactory'),
     'Services\IFacebookSessionFactory' => DI\object('Services\FacebookSessionFactory')
         ->constructor(DI\link('facebook.app')),
+    'Services\ISimfileParser' => DI\object('Services\SimfileParser'),
     
     //DA
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),

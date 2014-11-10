@@ -25,4 +25,3 @@ $controller = $container->get('Controllers\\' . ucfirst($controllerName) . 'Cont
 
 // Last thing to do, call the action on the specified controller.
 call_user_func_array(array($controller, $controllerAction . 'Action'), $controllerActionArgs);
-
