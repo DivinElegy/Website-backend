@@ -10,13 +10,13 @@ class Difficulty implements IDifficulty
     protected $itgName;
     
     private $_nameMap = array(
-        'light' => 'Novice',
-        'beginner' => 'Novice',
-        'easy' => 'Easy',
-        'medium' => 'Medium',
-        'hard' => 'Hard',
-        'challenge' => 'Expert',
-        'edit' => 'Edit'
+        'Light' => 'Novice',
+        'Beginner' => 'Novice',
+        'Easy' => 'Easy',
+        'Medium' => 'Medium',
+        'Hard' => 'Hard',
+        'Challenge' => 'Expert',
+        'Edit' => 'Edit'
     );
     
     public function __construct($stepManiaName) {
