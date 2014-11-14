@@ -57,6 +57,11 @@ class DataMapper implements IDataMapper
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
 
+        echo '<pre>';
+        print_r($queries);
+        echo '</pre>';
+        echo '<br /><br />';
+        
         $flattened = array();
         $flattened_tables = array();
         foreach($queries as $index => $query)
@@ -136,10 +141,15 @@ class DataMapper implements IDataMapper
             foreach($queries as $query)
             {
                 $query = str_replace('%MAIN_QUERY_ID%', end($idMap), $query);
+                echo $query;
                 $statement = $this->_db->prepare($query);
                 $statement->execute();
             }
         //}
+            
+        $entity->setId(end($idMap));
+        
+        return $entity;
     }
     
     //TODO: Implement

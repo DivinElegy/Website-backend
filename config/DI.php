@@ -15,6 +15,9 @@ return [
     'Domain\Entities\StepMania\ISimfileStepByStepBuilder' => DI\object('Domain\Entities\StepMania\SimfileStepByStepBuilder'),
     'Domain\Entities\StepMania\ISimfileBuilder' => DI\object('Domain\Entities\StepMania\SimfileBuilder'),
     'Domain\Entities\StepMania\ISimfileFactory' => DI\object('Domain\Entities\StepMania\SimfileFactory'),
+    'Domain\Entities\IFileStepByStepBuilder' => DI\object('Domain\Entities\FileStepByStepBuilder'),
+    'Domain\Entities\IFileBuilder' => DI\object('Domain\Entities\FileBuilder'),
+    'Domain\Entities\IFileFactory' => DI\object('Domain\Entities\FileFactory'),
     
     //services
     'Services\Http\IHttpResponse' => DI\object('Services\Http\HttpResponse'),
@@ -22,10 +25,12 @@ return [
     'Services\Routing\IRouter' => DI\object('Services\Routing\Router')
         ->constructor(DI\link('router.maps')),
     'Services\Uploads\IUploadManager' => DI\object('Services\Uploads\UploadManager'),
+    'Services\IUserSession' => DI\object('Services\UserSession'),
     'Services\Uploads\IFileFactory' => DI\object('Services\Uploads\FileFactory'),
     'Services\IFacebookSessionFactory' => DI\object('Services\FacebookSessionFactory')
         ->constructor(DI\link('facebook.app')),
     'Services\ISimfileParser' => DI\object('Services\SimfileParser'),
+    'Services\IBannerExtracter' => DI\object('Services\BannerExtracter'),
     
     //DA
     'DataAccess\StepMania\ISimfileRepository' => DI\object('DataAccess\StepMania\SimfileRepository'),

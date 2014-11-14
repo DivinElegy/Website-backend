@@ -16,6 +16,7 @@ interface ISimfile extends IDivineEntity
     public function hasFgChanges();
     public function hasBgChanges();
     public function getBanner();
+    public function getSimfile();
         
     public function addStepChart(IStepChart $stepChart);
     public function getSteps();

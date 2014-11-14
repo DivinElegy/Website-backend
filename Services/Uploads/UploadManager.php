@@ -5,16 +5,25 @@ namespace Services\Uploads;
 use Services\Uploads\IUploadManager;
 use Services\Uploads\IFileFactory;
 use Services\Uploads\IFile;
+//This was a bit silly, I have a File object to use with the service but there is also a File entity.
+//It's confusing but if you pay attention it should be OK.
+use Domain\Entities\IFileStepByStepBuilder;
+use DataAccess\IFileRepository;
 use Exception;
 
 class UploadManager implements IUploadManager{        
     
     private $_files= array();
     private $_fileFactory;
+    private $_basePath;
     private $_destination;
+    private $_fileBuilder;
+    private $_fileRepository;
         
-    public function __construct(IFileFactory $fileFactory) {
+    public function __construct(IFileFactory $fileFactory, IFileStepByStepBuilder $builder, IFileRepository $fileRepository) {
         $this->_fileFactory = $fileFactory;
+        $this->_fileBuilder = $builder;
+        $this->_fileRepository = $fileRepository;
         
         if($_FILES) {
             foreach($_FILES as $file)
@@ -29,8 +38,19 @@ class UploadManager implements IUploadManager{
         }
     }
     
-   public function setDestination($path) {
+    public function setFilesDirectory($path) {
         if(!$this->destinationExists($path))
+        {
+            throw new Exception('Invalid path. Path does not exist.');
+        }
+        
+        $this->_basePath = $path;
+        
+        return $this;
+    }
+    
+    public function setDestination($path) {
+        if(!$this->destinationExists($this->_basePath . '/' . $path))
         {
             throw new Exception('Invalid path. Path does not exist.');
         }
@@ -49,7 +69,7 @@ class UploadManager implements IUploadManager{
         if($this->_destination)
         {
             $randomName = $this->randomFilename();
-            $result = move_uploaded_file($file->getTempName(), $this->_destination . '/' . $randomName . '.' . $file->getExtension());
+            $result = move_uploaded_file($file->getTempName(), $this->_basePath . '/' . $this->_destination . '/' . $randomName . '.' . $file->getExtension());
         }
         
         if(!$result)
@@ -71,7 +91,18 @@ class UploadManager implements IUploadManager{
         
         foreach($this->_files as $file)
         {
-            $results[$file->getName()] = $this->saveFile($file);
+            $hash = $this->saveFile($file);
+            
+            /* @var $file \Services\Uploads\IFile */
+            $file = $this->_fileBuilder->With_Hash($hash)
+                                       ->With_Path(rtrim($this->_destination, '/'))
+                                       ->With_Filename($file->getName())
+                                       ->With_Mimetype($file->getType())
+                                       ->With_Size($file->getSize())
+                                       ->With_UploadDate(time())
+                                       ->build();
+            
+            $results[] = $this->_fileRepository->save($file);
         }
         
         return $results;

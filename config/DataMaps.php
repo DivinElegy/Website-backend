@@ -21,6 +21,7 @@ return [
             'fgChanges' => DataAccess\Int('fg_changes', 'hasFgChanges'),
             'bgChanges' => DataAccess\Int('bg_changes', 'hasBgChanges'),
             'banner' => DataAccess\Entity('File', 'getBanner', 'banner_file'),
+            'simfile' => DataAccess\Entity('File', 'getSimfile', 'simfile_file'),
             'steps' => DataAccess\VOArray('StepChart', 'getSteps')
         ]
     ],
@@ -123,8 +124,7 @@ return [
             'filename' => DataAccess\Varchar('filename'),
             'mimetype' => DataAccess\Varchar('mimetype'),
             'size' => DataAccess\Int('size'),
-            //TODO: actually this is stored as a datetime, might need datetime helper for stuff
-            'uploadDate' => DataAccess\Varchar('uploaded')
+            'uploadDate' => DataAccess\Int('uploaded', 'getUploadDate')
         ]
     ]
 ];

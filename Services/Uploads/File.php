@@ -32,4 +32,14 @@ class File implements IFile {
     {
         return $this->_name;
     }
+    
+    public function getType()
+    {
+        return $this->_type;
+    }
+    
+    public function getSize()
+    {
+        return $this->_size;
+    }
 }

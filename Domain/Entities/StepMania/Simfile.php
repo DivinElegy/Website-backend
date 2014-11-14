@@ -23,6 +23,7 @@ class Simfile extends AbstractEntity implements ISimfile
     private $_fgChanges = false;
     private $_bgChanges = false;
     private $_banner;
+    private $_simfile;
     private $_steps;
     
     public function __construct(
@@ -35,6 +36,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $fgChanges,
         $bgChanges,
         IFile $banner = null,
+        IFile $simfile = null,
         array $steps
     ) {
         $this->_title = $title;
@@ -46,6 +48,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $this->_fgChanges = $fgChanges;
         $this->_bgChanges = $bgChanges;
         $this->_banner = $banner;
+        $this->_simfile = $simfile;
 
         foreach($steps as $stepChart) {
             if(!$stepChart instanceof IStepChart) {
@@ -103,6 +106,11 @@ class Simfile extends AbstractEntity implements ISimfile
     public function getBanner()
     {
         return $this->_banner;
+    }
+    
+    public function getSimfile()
+    {
+        return $this->_simfile;
     }
     
     public function getSteps()

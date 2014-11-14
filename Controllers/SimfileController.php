@@ -5,40 +5,41 @@ namespace Controllers;
 use ZipArchive;
 use Exception;
 use Controllers\IDivineController;
-use Services\Http\IHttpRequest;
 use Services\Http\IHttpResponse;
 use Services\Uploads\IUploadManager;
 use Services\ISimfileParser;
+use Services\IUserSession;
+use Services\IBannerExtracter;
 use DataAccess\StepMania\ISimfileRepository;
-use DataAccess\IUserRepository;
 use Domain\Entities\StepMania\ISimfileStepByStepBuilder;
 
 class SimfileController implements IDivineController
 {
     private $_simfileRepository;
     private $_response;
-    private $_request;
     private $_uploadManager;
     private $_simfileParser;
     private $_simfileBuilder;
     private $_userRepository;
+    private $_userSession;
+    private $_bannerExtracter;
     
     public function __construct(
-        IHttpRequest $request,
         IHttpResponse $response,
         IUploadManager $uploadManager,
         ISimfileRepository $repository,
-        IUserRepository $userRepository,
+        IUserSession $userSession,
         ISimfileParser $simfileParser,
-        ISimfileStepByStepBuilder $simfileBuilder
+        ISimfileStepByStepBuilder $simfileBuilder,
+        IBannerExtracter $bannerExtracter
     ) {
-        $this->_request = $request;
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
         $this->_simfileRepository = $repository;
-        $this->_userRepository = $userRepository;
+        $this->_userSession = $userSession;
         $this->_simfileParser = $simfileParser;
         $this->_simfileBuilder = $simfileBuilder;
+        $this->_bannerExtracter = $bannerExtracter;
     }
     
     public function indexAction() {
@@ -93,22 +94,17 @@ class SimfileController implements IDivineController
     }
     
     public function uploadAction()
-    {        
-        //logic for if pack or individual file
-        $request = $this->_request->post();
-        //XXX: Could be a place UserService could look for token ?
-        $token = $request['token'];
-                
+    {                       
         //TODO: Put directory in config ?
-        $filenames = $this->_uploadManager->setDestination('../files/StepMania/')
-                                          ->process();
-        
-        print_r($filenames);
-        foreach($filenames as $filename => $hash)
+        $files = $this->_uploadManager->setFilesDirectory('../files')
+                                      ->setDestination('StepMania/')
+                                      ->process();
+
+        foreach($files as $file)
         {
             $za = new ZipArchive();
             //XXX: We assume all files are zips. Should be enforced by validation elsewhere.
-            $res = $za->open('../files/StepMania/' . $hash . '.zip');
+            $res = $za->open('../files/StepMania/' . $file->getHash() . '.zip');
             
             if($res !== true) throw new Exception ('Could not open zip for reading.');
             
@@ -117,30 +113,38 @@ class SimfileController implements IDivineController
                 $stat = $za->statIndex($i);
                 if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
                 {
-                    $smData = file_get_contents('zip://../files/StepMania/' . $hash . '.zip#' . $stat['name']);
+                    $smData = file_get_contents('zip://../files/StepMania/' . $file->getHash() . '.zip#' . $stat['name']);
                     break;
                 }
             }
+
+            if(!$smData) throw new Exception('Could not extract simfile.');
+
+            /* @var $parser \Services\ISimfileParser */
+            $parser = $this->_simfileParser;
+            $parser->parse($smData);
+
+            $banner = $this->_bannerExtracter->extractBanner('../files/StepMania/' . $file->getHash() . '.zip', $parser->banner());
+                        
+            //TODO: Create file object for banner and .zip then link them up
+            //shouldn't need to use repository as the mapper can create the db entries
+            //all in one go (I think ...)
+            //
+            //Need to make FileBuilder and FileStepByStepBuilder
+            $simfile = $this->_simfileBuilder->With_Title($parser->title())
+                                             ->With_Artist($parser->artist())
+                                             ->With_Uploader($this->_userSession->getCurrentUser()) //obj
+                                             ->With_BPM($parser->bpm())
+                                             ->With_BpmChanges($parser->bpmChanges())
+                                             ->With_Stops($parser->stops())
+                                             ->With_FgChanges($parser->fgChanges())
+                                             ->With_BgChanges($parser->bgChanges())
+                                             ->With_Steps($parser->steps())
+                                             ->With_Simfile($file)
+                                             ->With_Banner($banner)
+                                             ->build();
+            
+            $this->_simfileRepository->save($simfile);
         }
-        
-        if(!$smData) throw new Exception('Could not extract simfile.');
-        
-        /* @var $parser \Services\ISimfileParser */
-        $parser = $this->_simfileParser;
-        $parser->parse($smData);
-
-        //TODO: Instantiating VOs like this bad ?
-        $this->_simfileBuilder->With_Title($parser->title())
-                              ->With_Artist(new \Domain\VOs\StepMania\Artist($parser->artist()))
-                              ->With_Uploader($this->_userRepository->findByAuthToken($token)) //obj
-                              ->With_BPM($bpm) //obj
-                              ->With_BpmChanges($parser->bpmChanges())
-                              ->With_Stops($parser->stops())
-                              ->With_FgChanges($parser->fgChanges())
-                              ->With_BgChanges($parser->bgChanges())
-                              ->With_Steps($steps) //obj
-                              ->build();
-
-        //parse .sm files and save to DB. should use SimfileParser service
     }
 }

@@ -5,6 +5,7 @@ namespace DataAccess;
 use DataAccess\IFileRepository;
 use DataAccess\DataMapper\IDataMapper;
 use DataAccess\Queries\IQueryBuilderFactory;
+use Domain\Entities\IFile;
 
 class FileRepository implements IFileRepository
 {
@@ -45,5 +46,9 @@ class FileRepository implements IFileRepository
                    );
                 
         return reset($results);
+    }
+    
+    public function save(\Domain\Entities\IFile $file) {
+        return $this->_dataMapper->save($file);
     }
 }

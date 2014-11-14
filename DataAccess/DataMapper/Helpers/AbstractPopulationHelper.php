@@ -154,11 +154,13 @@ class AbstractPopulationHelper
                                 if($id)
                                 {
                                     $query .= sprintf('%s=%u, ',
-                                        strtolower($mapsHelper->getEntityName() . '_id'),
+                                        //strtolower($mapsHelper->getEntityName() . '_id'),
+                                        strtolower($mapsHelper->getTableName() . '_id'),
                                         $property->getId());
                                 } else {
                                     //not in db yet. make new ref
-                                    $queryColumnNamesAndValues[strtolower($mapsHelper->getEntityName() . '_id')] = $property->getId();
+                                    //$queryColumnNamesAndValues[strtolower($mapsHelper->getEntityName() . '_id')] = $property->getId();
+                                    $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = $property->getId();
                                 }
                             } else {
                                 // The entity we care about references an entity that

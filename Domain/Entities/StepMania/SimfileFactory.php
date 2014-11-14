@@ -6,6 +6,7 @@ use Domain\VOs\StepMania\IArtist;
 use Domain\VOs\StepMania\IBPM;
 use Domain\Entities\StepMania\Simfile;
 use Domain\Entities\IUser;
+use Domain\Entities\IFile;
 
 interface ISimfileFactory
 {
@@ -18,6 +19,8 @@ interface ISimfileFactory
         $stops,
         $fgChanges,
         $bgChanges,
+        IFile $banner,
+        IFile $simfile,
         array $steps
     );
 }
@@ -33,6 +36,8 @@ class SimfileFactory implements ISimfileFactory
         $stops,
         $fgChanges,
         $bgChanges,
+        IFile $banner = null,
+        IFile $simfile = null,
         array $steps
     ) {
         return new Simfile(
@@ -44,6 +49,8 @@ class SimfileFactory implements ISimfileFactory
             $stops,
             $fgChanges,
             $bgChanges,
+            $banner,
+            $simfile,
             $steps
         );
     }

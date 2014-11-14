@@ -5,6 +5,7 @@ namespace Domain\Entities\StepMania;
 use Domain\VOs\StepMania\IArtist;
 use Domain\VOs\StepMania\IBPM;
 use Domain\Entities\IUser;
+use Domain\Entities\IFile;
 use Domain\Entities\StepMania\ISimfileFactory;
 use Domain\Entities\StepMania\ISimfileBuilder;
 
@@ -20,6 +21,8 @@ class SimfileBuilder implements ISimfileBuilder
     private $_stops;
     private $_fgChanges;
     private $_bgChanges;
+    private $_banner;
+    private $_simfile;
     private $_steps;
     
     //override parent
@@ -68,6 +71,16 @@ class SimfileBuilder implements ISimfileBuilder
         return $this;
     }
     
+    public function With_Banner(IFile $banner) {
+        $this->_banner = $banner;
+        return $this;
+    }
+    
+    public function With_Simfile(IFile $simfile) {
+        $this->_simfile = $simfile;
+        return $this;
+    }
+    
     public function With_Steps(array $steps) {
         $this->_steps = $steps;
         return $this;
@@ -83,6 +96,8 @@ class SimfileBuilder implements ISimfileBuilder
                                      $this->_stops,
                                      $this->_fgChanges,
                                      $this->_bgChanges,
+                                     $this->_banner,
+                                     $this->_simfile,
                                      $this->_steps);
     }
 }

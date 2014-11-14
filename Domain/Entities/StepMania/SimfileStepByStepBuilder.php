@@ -7,6 +7,7 @@ use Domain\VOs\StepMania\IArtist;
 use Domain\VOs\StepMania\IBPM;
 use Domain\Entities\StepMania\ISimfileBuilder;
 use Domain\Entities\IUser;
+use Domain\Entities\IFile;
 
 interface ISimfileStepByStepBuilder
 {
@@ -55,6 +56,8 @@ interface ISimfileStepByStepBuilder_With_BgChanges
 
 interface ISimfileStepByStepBuilder_With_Steps
 {
+    public function With_Banner(IFile $banner);
+    public function With_Simfile(IFile $simfile);
     public function build();
 }
 
@@ -147,6 +150,16 @@ class SimfileStepByStepBuilder_With_BgChanges extends AbstractSimfileStepByStepB
 
 class SimfileStepByStepBuilder_With_Steps extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Steps
 {
+    public function With_Banner(IFile $banner) {
+        $this->_simfileBuilder->With_Banner($banner);
+        return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
+    }
+    
+    public function With_Simfile(IFile $simfile) {
+        $this->_simfileBuilder->With_Simfile($simfile);
+        return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
+    }
+    
     public function build() {
         return $this->_simfileBuilder
                     ->build();

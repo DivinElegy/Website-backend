@@ -36,7 +36,7 @@ class SimfileRepository implements ISimfileRepository
     }
     
     public function save(ISimfile $entity) {
-        $this->_dataMapper->save($entity);
+        return $this->_dataMapper->save($entity);
     }
     
     //TODO: Implement

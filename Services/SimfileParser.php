@@ -24,6 +24,11 @@ class SimfileParser implements ISimfileParser
         $this->_smFileLines = explode(";", $simfileData);
     }
     
+    public function banner()
+    {
+        return $this->extractKey('BANNER') ?: null;
+    }
+    
     public function title()
     {
         $title = $this->extractKey('TITLE');
@@ -37,7 +42,7 @@ class SimfileParser implements ISimfileParser
         $artist = $this->extractKey('ARTIST');
         if(!$artist) throw new Exception ('Invalid SM file. ARTIST missing');
         
-        return $artist;
+        return new \Domain\VOs\StepMania\Artist($artist);
     }
     
     public function stops()
@@ -56,6 +61,22 @@ class SimfileParser implements ISimfileParser
         return $fgChanges;
     }
     
+    public function bpm()
+    {
+        $displayBpm = $this->extractKey('DISPLAYBPM');
+        
+        if($displayBpm)
+        {
+            $bpmRange = explode(":",$displayBpm);
+        } else {
+            $bpms = $this->extractKey('BPMS');
+            $bpmRange = $this->parseBpms($bpms);
+        }
+        
+        //I have nfi why I made the BPM VO high-low instead of low-high in the constructor but yolo
+        return new \Domain\VOs\StepMania\BPM($bpmRange[1], $bpmRange[0]);
+    }
+    
     public function bgChanges()
     {
         $bgChanges = $this->extractKey('BGCHANGES') ? 'Yes' : 'No';
@@ -66,7 +87,7 @@ class SimfileParser implements ISimfileParser
     
     public function bpmChanges() 
     {
-        $bmpChanges = $this->extractKey('BPMS') ? 'Yes' : 'No';
+        $bpmChanges = $this->extractKey('BPMS') ? 'Yes' : 'No';
         if(!$bpmChanges) throw new Exception ('Invalid SM file. BPMS missing');
         
         return $bpmChanges;
@@ -91,26 +112,23 @@ class SimfileParser implements ISimfileParser
             if ($pos !== false)
             {
                 $noteData = trim(substr($line, $pos + 9));
-                $allSteps = array_merge($allSteps, $this->stepsArrayFromNoteData($noteData));
+                $allSteps[] = $this->stepchartFromNoteData($noteData);
             }
         }
-
+        
         if(empty($allSteps)) throw new Exception('Invalid Sm file. NOTES missing');
         return $allSteps;
     }
-
-    private function stepsArrayFromNoteData($noteData)
+    
+    private function stepchartFromNoteData($noteData)
     {
         $stepData = array_map('trim', explode(':', $noteData));
-        $steps = array();
-        $mode = $stepData[0] == 'dance-single' ? 'single' : null;
-        $steps[$mode][] = array(
-            'artist' => $stepData[1],
-            'difficulty' => $stepData[2],
-            'rating' => $stepData[3]
+        return new \Domain\VOs\StepMania\StepChart(
+            new \Domain\VOs\StepMania\DanceMode($stepData[0]),
+            new \Domain\VOs\StepMania\Difficulty($stepData[2]),
+            new \Domain\VOs\StepMania\StepArtist($stepData[1]),
+            $stepData[3]
         );
-        
-        return $steps;
     }
     
     private function extractKey($key)
@@ -122,5 +140,24 @@ class SimfileParser implements ISimfileParser
             $pos = strpos($line, '#' . $key . ':');
             if ($pos !== false) return trim(substr($line, $pos + strlen($key) + 2));
         }
+    }
+    
+    private function parseBpms($bpms)
+    {
+        $bpms = explode(",", $bpms);
+        $bpmRange = array('high' => null, 'low' => null);
+
+        foreach($bpms as $bpm)
+        {
+                $bpmMeasure = explode('=', $bpm);
+                $bpmValue = floatval($bpmMeasure[1]);
+
+                if(empty($bpmRange['low'])) $bpmRange['low'] = $bpmRange['high'] = $bpmValue;
+
+                $bpmRange['high'] = ($bpmValue > $bpmRange['high']) ? $bpmValue : $bpmRange['high'];
+                $bpmRange['low'] = ($bpmValue < $bpmRange['low']) ? $bpmValue : $bpmRange['low'];
+        }
+        
+        return array($bpmRange['low'], $bpmRange['high']);
     }
 }
