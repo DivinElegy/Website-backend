@@ -56,11 +56,6 @@ class DataMapper implements IDataMapper
     public function save(IDivineEntity $entity)
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
-
-        echo '<pre>';
-        print_r($queries);
-        echo '</pre>';
-        echo '<br /><br />';
         
         $flattened = array();
         $flattened_tables = array();
