@@ -54,205 +54,210 @@ class AbstractPopulationHelper
             $accessor = $mapsHelper->getAccessor();
             $property = $entity->{$accessor}();
 
-            switch(get_class($mapsHelper))
+            //sometimes children objects will be null, e.g., the banner for a simfile
+            //just skip them
+            if(!is_null($property)) 
             {
-                case 'DataAccess\DataMapper\Helpers\VOMapsHelper':
-                    //we have a vo. Determine which way the reference is
-                    $voMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
-                    $refDir = self::getReferenceDirection(
-                        $maps[$entityMapsIndex]['table'],
-                        $maps[$voMapsIndex]['table'],
-                        $entityMapsIndex,
-                        $mapsHelper->getTableName(),
-                        $db);
-                    
-                    switch($refDir)
-                    {
-                        // our table stores their ID, all we do is update
-                        // our reference.
-                        case self::REFERENCE_FORWARD:
-                            $voTableId = self::findVOInDB($maps, $property, $db);
-                            
-                            if($id)
-                            {
-                                $query .= sprintf('%s=%u, ',
-                                    strtolower($mapsHelper->getTableName() . '_id'),
-                                    $voTableId);
-                            } else {
-                                // we have a forward reference to a value object.
-                                // see if it exists first:                                
-                                if($voTableId)
-                                {
-                                    $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = $voTableId;
-                                } else {
-                                    //make a note that this field will need the id from another
-                                    self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries);
-                                    $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = '%INDEX_REF_' . (count($queries)-1) . '%';
-                                }
-                            }
+                switch(get_class($mapsHelper))
+                {
+                    case 'DataAccess\DataMapper\Helpers\VOMapsHelper':
+                        //we have a vo. Determine which way the reference is
+                        $voMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
+                        $refDir = self::getReferenceDirection(
+                            $maps[$entityMapsIndex]['table'],
+                            $maps[$voMapsIndex]['table'],
+                            $entityMapsIndex,
+                            $mapsHelper->getTableName(),
+                            $db);
 
-                            break;
-                        case self::REFERENCE_SELF:
-                            //no need to find ids, but we need the
-                            //column names
-                            $columns = self::resolveColumnNamesAndValues($maps, $property);
-                            foreach($columns as $columnName=>$columnValue)
-                            {
-                                if($id)
-                                {
-                                    //TODO: logic to detemine what the value is? i.e., string, int etc?
-                                    $query .= sprintf('%s="%s", ',
-                                        $columnName,
-                                        $columnValue
-                                    );
-                                } else {
-                                    //TODO: logic to detemine what the value is? i.e., string, int etc?
-                                    $queryColumnNamesAndValues[$columnName] = sprintf('"%s"', $columnValue);
-                                }
-                            }
+                        switch($refDir)
+                        {
+                            // our table stores their ID, all we do is update
+                            // our reference.
+                            case self::REFERENCE_FORWARD:
+                                $voTableId = self::findVOInDB($maps, $property, $db);
 
-                            break;
-                        case self::REFERENCE_BACK:
-                            $voId = self::findVOInDB($maps,
-                                $property,
-                                $db,
-                                array(strtolower($entityMapsIndex . '_id') => $id));
-                            if($voId)
-                            {
-                                self::generateUpdateSaveQuery($maps, $property, $voId, $db, $queries);   
-                            } else {
-                                $extra = array(strtolower($entityMapsIndex . '_id') => '%MAIN_QUERY_ID%');
-                                self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries, $extra);
-                            }
-                            break;
-                    }
-
-                    break;
-
-                // We should never update referenced entities, the db
-                // should always store an ID as a reference to them.
-                //
-                // In the case where we cannot find the entity in the database,
-                // throw an exception ?
-                case 'DataAccess\DataMapper\Helpers\EntityMapsHelper':
-                    $subEntityMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
-                    $refDir = self::getReferenceDirection(
-                        $maps[$entityMapsIndex]['table'],
-                        $maps[$subEntityMapsIndex]['table'],
-                        $entityMapsIndex,
-                        $mapsHelper->getTableName(),
-                        $db);
-
-                    switch($refDir)
-                    {
-                        // our table stores their ID, all we do is update
-                        // our reference.
-                        case self::REFERENCE_FORWARD:
-                            if($property->getId())
-                            {
-                                // we exist in db already, update our reference
                                 if($id)
                                 {
                                     $query .= sprintf('%s=%u, ',
-                                        //strtolower($mapsHelper->getEntityName() . '_id'),
                                         strtolower($mapsHelper->getTableName() . '_id'),
-                                        $property->getId());
+                                        $voTableId);
                                 } else {
-                                    //not in db yet. make new ref
-                                    //$queryColumnNamesAndValues[strtolower($mapsHelper->getEntityName() . '_id')] = $property->getId();
-                                    $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = $property->getId();
+                                    // we have a forward reference to a value object.
+                                    // see if it exists first:                                
+                                    if($voTableId)
+                                    {
+                                        $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = $voTableId;
+                                    } else {
+                                        //make a note that this field will need the id from another
+                                        self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries);
+                                        $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = '%INDEX_REF_' . (count($queries)-1) . '%';
+                                    }
                                 }
-                            } else {
-                                // The entity we care about references an entity that
-                                // has not yet been saved.
-                                //
-                                // TODO: Should we _try_ to save it? Or should
-                                // it be enforced that entites already exist in the db?
-                                // In the case of something like referencing a user entity,
-                                // then for sure the user should already be saved because
-                                // it makes no sense to assign a user at the time of simfile
-                                // upload, they should have already completed the process.
-                                // but could there be other entities where it does make sense
-                                // for them to be created at the time of something else ?
-                                throw new Exception(sprintf(
-                                    'Could not find referenced entity, %s, in the database. Has it been saved yet?',
-                                     $mapsHelper->getEntityName()));
-                            }
-                            break;
-                    }
-                    break;
-                case 'DataAccess\DataMapper\Helpers\IntMapsHelper':
-                    if($id)
-                    {
-                        //easy case, plain values in our table.
-                        $query .= sprintf('%s=%u, ',
-                            $mapsHelper->getColumnName(),
-                            $property);               
-                    } else {
-                        if(is_bool($property))
-                        {
-                            $property = ($property) ? '1' : '0';
-                        }
-                        $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('%u', $property);
-                    }
-                    break;
-                case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
-                    if($id){
-                        //easy case, plain values in our table.
-                        $query .= sprintf('%s="%s", ',
-                            $mapsHelper->getColumnName(),
-                            $property);                        
-                    } else {
-                        $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('"%s"', $property);
-                    }
 
-                    break;
+                                break;
+                            case self::REFERENCE_SELF:
+                                //no need to find ids, but we need the
+                                //column names
+                                $columns = self::resolveColumnNamesAndValues($maps, $property);
+                                foreach($columns as $columnName=>$columnValue)
+                                {
+                                    if($id)
+                                    {
+                                        //TODO: logic to detemine what the value is? i.e., string, int etc?
+                                        $query .= sprintf('%s="%s", ',
+                                            $columnName,
+                                            $columnValue
+                                        );
+                                    } else {
+                                        //TODO: logic to detemine what the value is? i.e., string, int etc?
+                                        $queryColumnNamesAndValues[$columnName] = sprintf('"%s"', $columnValue);
+                                    }
+                                }
 
-                // I am making a bit of an assumption here. In my mind it only
-                // makes sense for an array of VOs to be stored in a different
-                // table in the DB since the main row can't possibly store
-                // different objects.
-                //
-                // in that regard, the way this works is that mapVOArrayToIds
-                // simply queries the DB and returns the VO ids in order then
-                // I assume that the object also has them in the same order
-                // (which it will if it is pulled out by this mapper.
-                //
-                // in the case of setting up a new entity, the VOs should never
-                // exist in the first place, so we just make them.
-                case 'DataAccess\DataMapper\Helpers\VOArrayMapsHelper':
-                    if($id && isset($property[0]))
-                    {
-                        // If we assume that all elements in the array are the same then
-                        // we can just use the first one to figure out which maps entry to use
-                        
-                        $subEntityMapsIndex = self::getMapsNameFromEntityObject($property[0], $maps);
-                        $voIds = self::mapVOArrayToIds($maps[$subEntityMapsIndex]['table'],
-                            array(strtolower($entityMapsIndex . '_id'), $id),
-                            $db);
-                        
-                        foreach($property as $index => $propertyArrayElement)
-                        {
-                            $extra = array(strtolower($entityMapsIndex . '_id') => $id);
-                            if(isset($voIds[$index]))
-                            {
-                                self::generateUpdateSaveQuery($maps, $propertyArrayElement, $voIds[$index], $db, $queries, $extra);
-                            } else {
-                                self::generateUpdateSaveQuery($maps, $propertyArrayElement, NULL, $db, $queries, $extra);
-                            }
+                                break;
+                            case self::REFERENCE_BACK:
+                                $voId = self::findVOInDB($maps,
+                                    $property,
+                                    $db,
+                                    array(strtolower($entityMapsIndex . '_id') => $id));
+                                if($voId)
+                                {
+                                    self::generateUpdateSaveQuery($maps, $property, $voId, $db, $queries);   
+                                } else {
+                                    $extra = array(strtolower($entityMapsIndex . '_id') => '%MAIN_QUERY_ID%');
+                                    self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries, $extra);
+                                }
+                                break;
                         }
 
                         break;
-                    } else {
-                        foreach($property as $propertyArrayElement)
+
+                    // We should never update referenced entities, the db
+                    // should always store an ID as a reference to them.
+                    //
+                    // In the case where we cannot find the entity in the database,
+                    // throw an exception ?
+                    case 'DataAccess\DataMapper\Helpers\EntityMapsHelper':
+                        $subEntityMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
+                        $refDir = self::getReferenceDirection(
+                            $maps[$entityMapsIndex]['table'],
+                            $maps[$subEntityMapsIndex]['table'],
+                            $entityMapsIndex,
+                            $mapsHelper->getTableName(),
+                            $db);
+
+                        switch($refDir)
                         {
-                            // TODO: TRICKY! Since this is a back-reference, it
-                            // needs the ID of the object we're trying to save
-                            // to complete
-                            $extra = array(strtolower($entityMapsIndex . '_id') => '%MAIN_QUERY_ID%');
-                            self::generateUpdateSaveQuery($maps, $propertyArrayElement, NULL, $db, $queries, $extra);
+                            // our table stores their ID, all we do is update
+                            // our reference.
+                            case self::REFERENCE_FORWARD:
+                                if($property->getId())
+                                {
+                                    // we exist in db already, update our reference
+                                    if($id)
+                                    {
+                                        $query .= sprintf('%s=%u, ',
+                                            //strtolower($mapsHelper->getEntityName() . '_id'),
+                                            strtolower($mapsHelper->getTableName() . '_id'),
+                                            $property->getId());
+                                    } else {
+                                        //not in db yet. make new ref
+                                        //$queryColumnNamesAndValues[strtolower($mapsHelper->getEntityName() . '_id')] = $property->getId();
+                                        $queryColumnNamesAndValues[strtolower($mapsHelper->getTableName() . '_id')] = $property->getId();
+                                    }
+                                } else {
+                                    // The entity we care about references an entity that
+                                    // has not yet been saved.
+                                    //
+                                    // TODO: Should we _try_ to save it? Or should
+                                    // it be enforced that entites already exist in the db?
+                                    // In the case of something like referencing a user entity,
+                                    // then for sure the user should already be saved because
+                                    // it makes no sense to assign a user at the time of simfile
+                                    // upload, they should have already completed the process.
+                                    // but could there be other entities where it does make sense
+                                    // for them to be created at the time of something else ?
+                                    throw new Exception(sprintf(
+                                        'Could not find referenced entity, %s, in the database. Has it been saved yet?',
+                                         $mapsHelper->getEntityName()));
+                                }
+                                break;
                         }
-                    }
+                        break;
+                    case 'DataAccess\DataMapper\Helpers\IntMapsHelper':
+                        if($id)
+                        {
+                            //easy case, plain values in our table.
+                            $query .= sprintf('%s=%u, ',
+                                $mapsHelper->getColumnName(),
+                                $property);               
+                        } else {
+                            if(is_bool($property))
+                            {
+                                $property = ($property) ? '1' : '0';
+                            }
+                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('%u', $property);
+                        }
+                        break;
+                    case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
+                        if($id){
+                            //easy case, plain values in our table.
+                            $query .= sprintf('%s="%s", ',
+                                $mapsHelper->getColumnName(),
+                                $property);                        
+                        } else {
+                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('"%s"', $property);
+                        }
+
+                        break;
+
+                    // I am making a bit of an assumption here. In my mind it only
+                    // makes sense for an array of VOs to be stored in a different
+                    // table in the DB since the main row can't possibly store
+                    // different objects.
+                    //
+                    // in that regard, the way this works is that mapVOArrayToIds
+                    // simply queries the DB and returns the VO ids in order then
+                    // I assume that the object also has them in the same order
+                    // (which it will if it is pulled out by this mapper.
+                    //
+                    // in the case of setting up a new entity, the VOs should never
+                    // exist in the first place, so we just make them.
+                    case 'DataAccess\DataMapper\Helpers\VOArrayMapsHelper':
+                        if($id && isset($property[0]))
+                        {
+                            // If we assume that all elements in the array are the same then
+                            // we can just use the first one to figure out which maps entry to use
+
+                            $subEntityMapsIndex = self::getMapsNameFromEntityObject($property[0], $maps);
+                            $voIds = self::mapVOArrayToIds($maps[$subEntityMapsIndex]['table'],
+                                array(strtolower($entityMapsIndex . '_id'), $id),
+                                $db);
+
+                            foreach($property as $index => $propertyArrayElement)
+                            {
+                                $extra = array(strtolower($entityMapsIndex . '_id') => $id);
+                                if(isset($voIds[$index]))
+                                {
+                                    self::generateUpdateSaveQuery($maps, $propertyArrayElement, $voIds[$index], $db, $queries, $extra);
+                                } else {
+                                    self::generateUpdateSaveQuery($maps, $propertyArrayElement, NULL, $db, $queries, $extra);
+                                }
+                            }
+
+                            break;
+                        } else {
+                            foreach($property as $propertyArrayElement)
+                            {
+                                // TODO: TRICKY! Since this is a back-reference, it
+                                // needs the ID of the object we're trying to save
+                                // to complete
+                                $extra = array(strtolower($entityMapsIndex . '_id') => '%MAIN_QUERY_ID%');
+                                self::generateUpdateSaveQuery($maps, $propertyArrayElement, NULL, $db, $queries, $extra);
+                            }
+                        }
+                }
             }
         }
 //        
