@@ -11,7 +11,6 @@ use Domain\Entities\StepMania\ISimfileBuilder;
 
 class SimfileBuilder implements ISimfileBuilder  
 {    
-    /* var $_simfileFactor Domain\Entities\StepMania\ISimfileFactory */
     private $_simfileFactory;
     private $_title;
     private $_artist;

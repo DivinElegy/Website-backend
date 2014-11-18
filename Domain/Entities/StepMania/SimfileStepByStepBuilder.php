@@ -2,7 +2,6 @@
 
 namespace Domain\Entities\StepMania;
 
-use Domain\ConstantsAndTypes\SIMFILE_CONSTANT;
 use Domain\VOs\StepMania\IArtist;
 use Domain\VOs\StepMania\IBPM;
 use Domain\Entities\StepMania\ISimfileBuilder;
@@ -21,7 +20,7 @@ interface ISimfileStepByStepBuilder_With_Title
 
 interface ISimfileStepByStepBuilder_With_Artist
 {
-    public function With_Uploader(IUser $uploader); //TODO: Make user object
+    public function With_Uploader(IUser $uploader);
 }
 
 interface ISimfileStepByStepBuilder_With_Uploader
@@ -76,7 +75,8 @@ abstract class AbstractSimfileStepByStepBuilder
 
 class SimfileStepByStepBuilder extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder
 {
-    public function With_Title($title) {
+    public function With_Title($title)
+    {
         $this->_simfileBuilder->With_Title($title);
         return new SimfileStepByStepBuilder_With_Title($this->_simfileBuilder);
     }
@@ -102,7 +102,8 @@ class SimfileStepByStepBuilder_With_Artist extends AbstractSimfileStepByStepBuil
 
 class SimfileStepByStepBuilder_With_Uploader extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Uploader
 {
-    public function With_BPM(IBPM $bpm) {
+    public function With_BPM(IBPM $bpm)
+    {
         $this->_simfileBuilder->With_BPM($bpm);
         return new SimfileStepByStepBuilder_With_BPM($this->_simfileBuilder);
     }
@@ -110,7 +111,8 @@ class SimfileStepByStepBuilder_With_Uploader extends AbstractSimfileStepByStepBu
 
 class SimfileStepByStepBuilder_With_BPM extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_BPM
 {
-    public function With_BpmChanges($const) {
+    public function With_BpmChanges($const)
+    {
         $this->_simfileBuilder->With_BpmChanges($const);
         return new SimfileStepByStepBuilder_With_BpmChanges($this->_simfileBuilder);
     }
@@ -126,7 +128,8 @@ class SimfileStepByStepBuilder_With_BpmChanges extends AbstractSimfileStepByStep
 
 class SimfileStepByStepBuilder_With_Stops extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Stops
 {
-    public function With_FgChanges($const) {
+    public function With_FgChanges($const)
+    {
         $this->_simfileBuilder->With_FgChanges($const);
         return new SimfileStepByStepBuilder_With_FgChanges($this->_simfileBuilder);
     }
@@ -134,7 +137,8 @@ class SimfileStepByStepBuilder_With_Stops extends AbstractSimfileStepByStepBuild
 
 class SimfileStepByStepBuilder_With_FgChanges extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_FgChanges
 {
-    public function With_BgChanges($const) {
+    public function With_BgChanges($const)
+    {
         $this->_simfileBuilder->With_BgChanges($const);
         return new SimfileStepByStepBuilder_With_BgChanges($this->_simfileBuilder);
     }
@@ -142,7 +146,8 @@ class SimfileStepByStepBuilder_With_FgChanges extends AbstractSimfileStepByStepB
 
 class SimfileStepByStepBuilder_With_BgChanges extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_BgChanges
 {
-    public function With_Steps(array $steps) {
+    public function With_Steps(array $steps)
+    {
         $this->_simfileBuilder->With_Steps($steps);
         return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
     }
@@ -150,17 +155,20 @@ class SimfileStepByStepBuilder_With_BgChanges extends AbstractSimfileStepByStepB
 
 class SimfileStepByStepBuilder_With_Steps extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Steps
 {
-    public function With_Banner(IFile $banner) {
+    public function With_Banner(IFile $banner)
+    {
         $this->_simfileBuilder->With_Banner($banner);
         return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
     }
     
-    public function With_Simfile(IFile $simfile) {
+    public function With_Simfile(IFile $simfile)
+    {
         $this->_simfileBuilder->With_Simfile($simfile);
         return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
     }
     
-    public function build() {
+    public function build()
+    {
         return $this->_simfileBuilder
                     ->build();
     }

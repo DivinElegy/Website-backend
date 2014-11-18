@@ -20,8 +20,8 @@ class Pack extends AbstractEntity implements IPack
         $title,
         IUser $uploader,
         array $simfiles,
-        IFile $file = null)
-    {
+        IFile $file = null
+    ) {
         $this->_title = $title;
         $this->_uploader = $uploader;
         $this->_file = $file;
