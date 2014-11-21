@@ -49,7 +49,7 @@ class DataMapper implements IDataMapper
             $class->setId($row['id']);
             $entities[$row['id']] = $class;
         }
-
+        
         return $entities;
     }
         
@@ -136,7 +136,6 @@ class DataMapper implements IDataMapper
             foreach($queries as $query)
             {
                 $query = str_replace('%MAIN_QUERY_ID%', end($idMap), $query);
-                echo $query;
                 $statement = $this->_db->prepare($query);
                 $statement->execute();
             }

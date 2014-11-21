@@ -5,7 +5,6 @@ namespace DataAccess;
 use DataAccess\IFileRepository;
 use DataAccess\DataMapper\IDataMapper;
 use DataAccess\Queries\IQueryBuilderFactory;
-use Domain\Entities\IFile;
 
 class FileRepository implements IFileRepository
 {

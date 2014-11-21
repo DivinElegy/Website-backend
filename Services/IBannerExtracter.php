@@ -4,5 +4,6 @@ namespace Services;
 
 interface IBannerExtracter
 {
-    public function extractBanner($zipfile, $bannerName);
+    public function extractSongBanner($zipfile, $bannerName);
+    public function extractPackBanner($zipfile, $packname);
 }

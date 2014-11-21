@@ -23,6 +23,7 @@ interface IPackStepByStepBuilder_With_Uploader
 
 interface IPackStepByStepBuilder_With_Simfiles
 {
+    public function With_Banner(IFile $banner);
     public function With_File(IFile $file);
     public function build();
 }
@@ -52,8 +53,8 @@ class PackStepByStepBuilder_With_Title extends AbstractPackStepByStepBuilder imp
 {        
     public function With_Uploader(IUser $user)
     {
-        $this->_packBuilder->With_Artist($artist);
-        return new PackStepByStepBuilder_With_Artist($this->_packBuilder);
+        $this->_packBuilder->With_Uploader($user);
+        return new PackStepByStepBuilder_With_Uploader($this->_packBuilder);
     }
 }
 
@@ -68,11 +69,18 @@ class PackStepByStepBuilder_With_Uploader extends AbstractPackStepByStepBuilder 
 
 class PackStepByStepBuilder_With_Simfiles extends AbstractPackStepByStepBuilder implements IPackStepByStepBuilder_With_Simfiles
 {
+    public function With_Banner(IFile $banner)
+    {
+        $this->_packBuilder->With_File($banner);
+        return $this;
+    }
+    
     public function With_File(Ifile $file)
     {
         $this->_packBuilder->With_File($file);
+        return $this;
     }
-    
+
     public function build()
     {
         return $this->_simfileBuilder

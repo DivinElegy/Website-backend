@@ -6,7 +6,7 @@ use Exception;
 use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IUser;
 use Domain\Entities\IFile;
-use Domain\Entities\IPack;
+use Domain\Entities\StepMania\IPack;
 use Domain\Entities\AbstractEntity;
 
 class Pack extends AbstractEntity implements IPack
@@ -14,16 +14,19 @@ class Pack extends AbstractEntity implements IPack
     private $_title;
     private $_uploader;
     private $_simfiles;
+    private $_banner;
     private $_file;
     
     public function __construct(
         $title,
         IUser $uploader,
         array $simfiles,
+        IFile $banner = null,
         IFile $file = null
     ) {
         $this->_title = $title;
         $this->_uploader = $uploader;
+        $this->_banner = $banner;
         $this->_file = $file;
         
         foreach($simfiles as $simfile) {
@@ -66,6 +69,11 @@ class Pack extends AbstractEntity implements IPack
     public function getUploader()
     {
         return $this->_uploader;
+    }
+    
+    public function getBanner()
+    {
+        return $this->_banner;
     }
     
     private function getAllStepArtistsFromSimfile(ISimfile $simfile)

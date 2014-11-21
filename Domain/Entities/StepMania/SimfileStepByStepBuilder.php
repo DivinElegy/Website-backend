@@ -158,7 +158,7 @@ class SimfileStepByStepBuilder_With_Steps extends AbstractSimfileStepByStepBuild
     public function With_Banner(IFile $banner)
     {
         $this->_simfileBuilder->With_Banner($banner);
-        return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
+        return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder); //TODO: Pretty sure return $this will be OK
     }
     
     public function With_Simfile(IFile $simfile)

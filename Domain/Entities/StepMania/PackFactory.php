@@ -11,6 +11,7 @@ interface IPackFactory
         $title,
         IUser $uploader,
         array $simfiles,
+        IFile $banner = null,
         IFile $file = null
     );
 }
@@ -21,12 +22,14 @@ class PackFactory implements IPackFactory
         $title,
         IUser $uploader,
         array $simfiles,
+        IFile $banner = null,
         IFile $file = null
     ) {
         return new Pack(
             $title,
             $uploader,
             $simfiles,
+            $banner,
             $file
         );
     }

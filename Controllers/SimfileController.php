@@ -2,44 +2,41 @@
 
 namespace Controllers;
 
-use ZipArchive;
-use Exception;
 use Controllers\IDivineController;
 use Services\Http\IHttpResponse;
 use Services\Uploads\IUploadManager;
-use Services\ISimfileParser;
 use Services\IUserSession;
-use Services\IBannerExtracter;
+use Services\IZipParser;
 use DataAccess\StepMania\ISimfileRepository;
-use Domain\Entities\StepMania\ISimfileStepByStepBuilder;
+use DataAccess\StepMania\IPackRepository;
+use DataAccess\IFileRepository;
 
 class SimfileController implements IDivineController
 {
     private $_simfileRepository;
+    private $_packRepository;
+    private $_fileRepository;
     private $_response;
     private $_uploadManager;
-    private $_simfileParser;
-    private $_simfileBuilder;
-    private $_userRepository;
     private $_userSession;
-    private $_bannerExtracter;
+    private $_zipParser;
     
     public function __construct(
         IHttpResponse $response,
         IUploadManager $uploadManager,
-        ISimfileRepository $repository,
+        ISimfileRepository $simfileRepository,
+        IPackRepository $packRepository,
+        IFileRepository $fileRepository,
         IUserSession $userSession,
-        ISimfileParser $simfileParser,
-        ISimfileStepByStepBuilder $simfileBuilder,
-        IBannerExtracter $bannerExtracter
+        IZipParser $zipParser
     ) {
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
-        $this->_simfileRepository = $repository;
+        $this->_simfileRepository = $simfileRepository;
+        $this->_packRepository = $packRepository;
+        $this->_fileRepository = $fileRepository;
         $this->_userSession = $userSession;
-        $this->_simfileParser = $simfileParser;
-        $this->_simfileBuilder = $simfileBuilder;
-        $this->_bannerExtracter = $bannerExtracter;
+        $this->_zipParser = $zipParser;
     }
     
     public function indexAction() {
@@ -102,49 +99,24 @@ class SimfileController implements IDivineController
 
         foreach($files as $file)
         {
-            $za = new ZipArchive();
-            //XXX: We assume all files are zips. Should be enforced by validation elsewhere.
-            $res = $za->open('../files/StepMania/' . $file->getHash() . '.zip');
+            $zipParser = $this->_zipParser;
+            $zipParser->parse($file);
             
-            if($res !== true) throw new Exception ('Could not open zip for reading.');
-            
-            for($i=0; $i<$za->numFiles; $i++)
+            //save the actual zip in the db
+            //$this->_fileRepository->save($file);  
+            foreach($zipParser->simfiles() as $simfile)
             {
-                $stat = $za->statIndex($i);
-                if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
-                {
-                    $smData = file_get_contents('zip://../files/StepMania/' . $file->getHash() . '.zip#' . $stat['name']);
-                    break;
-                }
+                $this->_fileRepository->save($simfile->getBanner());
+                $this->_fileRepository->save($simfile->getSimfile());
+                $this->_simfileRepository->save($simfile);
             }
-
-            if(!$smData) throw new Exception('Could not extract simfile.');
-
-            /* @var $parser \Services\ISimfileParser */
-            $parser = $this->_simfileParser;
-            $parser->parse($smData);
-
-            $banner = $this->_bannerExtracter->extractBanner('../files/StepMania/' . $file->getHash() . '.zip', $parser->banner());
-                        
-            //TODO: Create file object for banner and .zip then link them up
-            //shouldn't need to use repository as the mapper can create the db entries
-            //all in one go (I think ...)
-            //
-            //Need to make FileBuilder and FileStepByStepBuilder
-            $simfile = $this->_simfileBuilder->With_Title($parser->title())
-                                             ->With_Artist($parser->artist())
-                                             ->With_Uploader($this->_userSession->getCurrentUser()) //obj
-                                             ->With_BPM($parser->bpm())
-                                             ->With_BpmChanges($parser->bpmChanges())
-                                             ->With_Stops($parser->stops())
-                                             ->With_FgChanges($parser->fgChanges())
-                                             ->With_BgChanges($parser->bgChanges())
-                                             ->With_Steps($parser->steps())
-                                             ->With_Simfile($file)
-                                             ->With_Banner($banner)
-                                             ->build();
             
-            $this->_simfileRepository->save($simfile);
+            if($zipParser->isPack())
+            {
+                $pack = $zipParser->pack();
+                $this->_fileRepository->save($pack->getBanner());
+                $this->_packRepository->save($pack);
+            }
         }
     }
 }

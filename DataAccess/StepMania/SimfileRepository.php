@@ -23,8 +23,9 @@ class SimfileRepository implements ISimfileRepository
     public function findById($id) {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();
         $queryBuilder->where('id', '=', $id);
-                
-        return $this->_dataMapper->map('Simfile', $queryBuilder);
+             
+        $result = $this->_dataMapper->map('Simfile', $queryBuilder);
+        return reset($result);
     }
     
     public function findRange($id, $limit)

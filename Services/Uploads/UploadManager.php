@@ -94,15 +94,13 @@ class UploadManager implements IUploadManager{
             $hash = $this->saveFile($file);
             
             /* @var $file \Services\Uploads\IFile */
-            $file = $this->_fileBuilder->With_Hash($hash)
+            $results[] = $this->_fileBuilder->With_Hash($hash)
                                        ->With_Path(rtrim($this->_destination, '/'))
                                        ->With_Filename($file->getName())
                                        ->With_Mimetype($file->getType())
                                        ->With_Size($file->getSize())
                                        ->With_UploadDate(time())
                                        ->build();
-            
-            $results[] = $this->_fileRepository->save($file);
         }
         
         return $results;

@@ -3,6 +3,7 @@
 namespace DataAccess;
 
 use DataAccess\DataMapper\Helpers\EntityMapsHelper;
+use DataAccess\DataMapper\Helpers\EntityArrayMapsHelper;
 use DataAccess\DataMapper\Helpers\VOMapsHelper;
 use DataAccess\DataMapper\Helpers\VOArrayMapsHelper;
 use DataAccess\DataMapper\Helpers\IntMapsHelper;
@@ -11,6 +12,11 @@ use DataAccess\DataMapper\Helpers\VarcharMapsHelper;
 function Entity($mapName, $accessor=null, $tableName = null)
 {
     return new EntityMapsHelper($mapName, $accessor, $tableName);
+}
+
+function EntityArray($mapName, $accessor=null, $tableName = null)
+{
+    return new EntityArrayMapsHelper($mapName, $accessor, $tableName);
 }
 
 function VO($mapName, $accessor=null, $tableName = null)

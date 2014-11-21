@@ -26,6 +26,18 @@ return [
         ]
     ],
     
+    'Pack' => [
+        'class' => 'Domain\Entities\StepMania\Pack',
+        'table' => 'packs',
+        'maps' => [
+            'title' => DataAccess\Varchar('title'),
+            'uploader' => DataAccess\Entity('User', 'getUploader'),
+            'simfiles' => DataAccess\EntityArray('Simfile', 'getSimfiles'),
+            'banner' => DataAccess\Entity('File', 'getBanner', 'banner_file'),
+            'file' => DataAccess\Entity('File', 'getFile')
+        ]
+    ],
+    
     'BPM' => [
         'class' => 'Domain\VOs\StepMania\BPM',
         'table' => 'simfiles',

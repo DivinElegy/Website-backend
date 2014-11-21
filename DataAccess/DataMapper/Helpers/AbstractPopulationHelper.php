@@ -2,8 +2,6 @@
 
 namespace DataAccess\DataMapper\Helpers;
 
-use DataAccess\DataMapper\Helpers\VOMapsHelper;
-use Domain\Entities\IDivineEntity;
 use Exception;
 
 class AbstractPopulationHelper
@@ -18,7 +16,7 @@ class AbstractPopulationHelper
     static function getConstrutorArray($maps, $entity, $row, $db)
     {
         $constructors = array();
-        
+                
         foreach($maps[$entity]['maps'] as $constructor => $mapsHelper)
         {
             switch(get_class($mapsHelper))
@@ -30,11 +28,11 @@ class AbstractPopulationHelper
                 case 'DataAccess\DataMapper\Helpers\VOMapsHelper':
                 case 'DataAccess\DataMapper\Helpers\VOArrayMapsHelper':
                 case 'DataAccess\DataMapper\Helpers\EntityMapsHelper':
+                case 'DataAccess\DataMapper\Helpers\EntityArrayMapsHelper':
                     $constructors[$constructor] = $mapsHelper->populate($maps, $db, $entity, $row);
                     break;
             }
         }
-        
         return $constructors;
     }
     
@@ -225,18 +223,32 @@ class AbstractPopulationHelper
                     // in the case of setting up a new entity, the VOs should never
                     // exist in the first place, so we just make them.
                     case 'DataAccess\DataMapper\Helpers\VOArrayMapsHelper':
+                    case 'DataAccess\DataMapper\Helpers\EntityArrayMapsHelper':
                         if($id && isset($property[0]))
                         {
                             // If we assume that all elements in the array are the same then
                             // we can just use the first one to figure out which maps entry to use
 
                             $subEntityMapsIndex = self::getMapsNameFromEntityObject($property[0], $maps);
+                            //TODO: I think this function will work with Entities too, but I should probably rename it at some point
                             $voIds = self::mapVOArrayToIds($maps[$subEntityMapsIndex]['table'],
                                 array(strtolower($entityMapsIndex . '_id'), $id),
                                 $db);
 
                             foreach($property as $index => $propertyArrayElement)
                             {
+                                //XXX: I wanted this to only run on VOs, not entities. But there's a problem with that.
+                                //when creating a pack, the simfile entities need to reference the pack, and the only way for
+                                //that to happen is here. What I do instead is check that the entity has an id (which implies
+                                //it has already been created and save) if it is a IDivineEntity. If it doesn't, complain.
+                                //this ensures consistent behaviour with other parts of this mapper.
+                                if($property instanceof \Domain\Entities\IDivineEntity && !$property->getId())
+                                {
+                                    throw new Exception(sprintf(
+                                        'Could not find referenced entity, %s, in the database. Has it been saved yet?',
+                                         $mapsHelper->getEntityName()));
+                                }
+                                
                                 $extra = array(strtolower($entityMapsIndex . '_id') => $id);
                                 if(isset($voIds[$index]))
                                 {
@@ -250,6 +262,18 @@ class AbstractPopulationHelper
                         } else {
                             foreach($property as $propertyArrayElement)
                             {
+                                //XXX: I wanted this to only run on VOs, not entities. But there's a problem with that.
+                                //when creating a pack, the simfile entities need to reference the pack, and the only way for
+                                //that to happen is here. What I do instead is check that the entity has an id (which implies
+                                //it has already been created and save) if it is a IDivineEntity. If it doesn't, complain.
+                                //this ensures consistent behaviour with other parts of this mapper.
+                                if($property instanceof \Domain\Entities\IDivineEntity && !$property->getId())
+                                {
+                                    throw new Exception(sprintf(
+                                        'Could not find referenced entity, %s, in the database. Has it been saved yet?',
+                                         $mapsHelper->getEntityName()));
+                                }
+                                
                                 // TODO: TRICKY! Since this is a back-reference, it
                                 // needs the ID of the object we're trying to save
                                 // to complete
@@ -260,22 +284,6 @@ class AbstractPopulationHelper
                 }
             }
         }
-//        
-//        if($id)
-//        {
-//            $query = substr($query, 0, -2);
-//            $query .= sprintf(' WHERE id=%u', $id);
-//            $queries['TYPE'] = self::QUERY_TYPE_UPDATE;
-//        } else {
-//            $queryColumnNamesAndValues = array_merge($queryColumnNamesAndValues, $extraColumns);
-//            $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
-//                $maps[$entityMapsIndex]['table'],
-//                implode(', ', array_keys($queryColumnNamesAndValues)),
-//                implode(', ', $queryColumnNamesAndValues));
-//            $queries['TYPE'] = self::QUERY_TYPE_CREATE;
-//        }
-//        print_r($queryColumnNamesAndValues);
-//        echo '<br />';
         
         if($id)
         {

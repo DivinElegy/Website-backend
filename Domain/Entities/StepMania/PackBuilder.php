@@ -14,6 +14,7 @@ class PackBuilder implements IPackBuilder
     private $_title;
     private $_uploader;
     private $_simfiles;
+    private $_banner;
     private $_file;
     
     //override parent
@@ -26,6 +27,11 @@ class PackBuilder implements IPackBuilder
     {
         $this->_title = $title;
         return $this;
+    }
+    
+    public function With_Banner(IFile $banner)
+    {
+        $this->_banner = $banner;
     }
     
     public function With_File(IFile $file)
