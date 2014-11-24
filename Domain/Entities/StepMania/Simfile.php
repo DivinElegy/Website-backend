@@ -5,9 +5,9 @@ namespace Domain\Entities\StepMania;
 use Domain\VOs\StepMania\IArtist;
 use Domain\VOs\StepMania\IBPM;
 use Domain\VOs\StepMania\IStepChart;
-use Domain\ConstantsAndTypes\SIMFILE_CONSTANT;
 use Domain\Exception\InvalidStepChartException;
 use Domain\Entities\StepMania\ISimfile;
+use Domain\Entities\StepMania\IPack;
 use Domain\Entities\IUser;
 use Domain\Entities\IFile;
 use Domain\Entities\AbstractEntity;
@@ -25,6 +25,7 @@ class Simfile extends AbstractEntity implements ISimfile
     private $_banner;
     private $_simfile;
     private $_steps;
+    private $_packId;
     
     public function __construct(
         $title,
@@ -37,6 +38,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $bgChanges,
         IFile $banner = null,
         IFile $simfile = null,
+        $packId = null,
         array $steps
     ) {
         $this->_title = $title;
@@ -49,6 +51,7 @@ class Simfile extends AbstractEntity implements ISimfile
         $this->_bgChanges = $bgChanges;
         $this->_banner = $banner;
         $this->_simfile = $simfile;
+        $this->_packId = $packId;
 
         foreach($steps as $stepChart) {
             if(!$stepChart instanceof IStepChart) {
@@ -116,5 +119,14 @@ class Simfile extends AbstractEntity implements ISimfile
     public function getSteps()
     {
         return $this->_steps;
+    }
+    
+    public function addToPack(IPack $pack) {
+        $this->_packId = $pack->getId();
+    }
+    
+    public function getPackId()
+    {
+        return $this->_packId;
     }
 }

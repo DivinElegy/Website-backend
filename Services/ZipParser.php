@@ -54,12 +54,13 @@ class ZipParser implements IZipParser
         {         
             $packname = $this->packNameFromFiles();
             $banner = $this->_bannerExtracter->extractPackBanner('../files/StepMania/' . $this->_file->getHash() . '.zip', $packname);
-            
+
             /* @var $builder \Domain\Entities\StepMania\PackStepByStepBuilder */
             $builder = $this->_packBuilder;
             return $builder->With_Title($packname)
                            ->With_Uploader($this->_userSession->getCurrentUser())
-                           ->With_Simfiles($this->_smFiles)
+                           //->With_Simfiles($this->_smFiles)
+                           ->With_Simfiles(array())
                            ->With_Banner($banner)
                            ->With_File($this->_file)
                            ->build();
@@ -89,9 +90,15 @@ class ZipParser implements IZipParser
             if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
             {
                 $smData = file_get_contents('zip://../files/StepMania/' . $this->_file->getHash() . '.zip#' . $stat['name']);
-                $this->_smFiles[$stat['name']] = $this->SmDataToSmClass($smData);
+                $this->_smFiles[$stat['name']] = $smData;
             }
         }
+        
+        //XXX: Hack. SmDataToSmClass needs to know whether we are dealing with a pack
+        //or single, but to do that we simply check the number of found sm files. To overcome this
+        //first populate the smFiles array with the raw sm data, then apply SmDataToSmClass on each
+        //array element. This way the check is accurate and the array gets populated as expected.
+        $this->_smFiles = array_map(array($this, 'SmDataToSmClass'), $this->_smFiles);
     }
     
     private function packNameFromFiles()
@@ -115,9 +122,9 @@ class ZipParser implements IZipParser
     {
         $parser = $this->_smParser;
         $parser->parse($smData);
-
         $banner = $this->_bannerExtracter->extractSongBanner('../files/StepMania/' . $this->_file->getHash() . '.zip', $parser->banner());
-
+        $file = $this->isPack() ? null : $this->_file;
+        
         return $this->_smBuilder->With_Title($parser->title())
                                 ->With_Artist($parser->artist())
                                 ->With_Uploader($this->_userSession->getCurrentUser()) //obj
@@ -127,7 +134,7 @@ class ZipParser implements IZipParser
                                 ->With_FgChanges($parser->fgChanges())
                                 ->With_BgChanges($parser->bgChanges())
                                 ->With_Steps($parser->steps())
-                                ->With_Simfile($this->_file)
+                                ->With_Simfile($file)
                                 ->With_Banner($banner)
                                 ->build();
     }

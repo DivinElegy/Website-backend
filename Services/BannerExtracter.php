@@ -84,7 +84,7 @@ class BannerExtracter implements IBannerExtracter
         }
         
         if(!isset($result) || !$result) return null;
-
+        
         $finfo = new finfo(FILEINFO_MIME);
         $mimetype = $finfo->file('../files/banners/' . $this->_destinationFileName);
         $size = filesize('../files/banners/' . $this->_destinationFileName);

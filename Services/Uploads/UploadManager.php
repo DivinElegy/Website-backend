@@ -8,7 +8,6 @@ use Services\Uploads\IFile;
 //This was a bit silly, I have a File object to use with the service but there is also a File entity.
 //It's confusing but if you pay attention it should be OK.
 use Domain\Entities\IFileStepByStepBuilder;
-use DataAccess\IFileRepository;
 use Exception;
 
 class UploadManager implements IUploadManager{        
@@ -18,12 +17,10 @@ class UploadManager implements IUploadManager{
     private $_basePath;
     private $_destination;
     private $_fileBuilder;
-    private $_fileRepository;
         
-    public function __construct(IFileFactory $fileFactory, IFileStepByStepBuilder $builder, IFileRepository $fileRepository) {
+    public function __construct(IFileFactory $fileFactory, IFileStepByStepBuilder $builder) {
         $this->_fileFactory = $fileFactory;
         $this->_fileBuilder = $builder;
-        $this->_fileRepository = $fileRepository;
         
         if($_FILES) {
             foreach($_FILES as $file)

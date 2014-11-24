@@ -55,8 +55,9 @@ interface ISimfileStepByStepBuilder_With_BgChanges
 
 interface ISimfileStepByStepBuilder_With_Steps
 {
-    public function With_Banner(IFile $banner);
-    public function With_Simfile(IFile $simfile);
+    public function With_Banner(IFile $banner = null);
+    public function With_Simfile(IFile $simfile = null);
+    public function With_PackId($packId = null);
     public function build();
 }
 
@@ -155,15 +156,21 @@ class SimfileStepByStepBuilder_With_BgChanges extends AbstractSimfileStepByStepB
 
 class SimfileStepByStepBuilder_With_Steps extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Steps
 {
-    public function With_Banner(IFile $banner)
+    public function With_Banner(IFile $banner = null)
     {
         $this->_simfileBuilder->With_Banner($banner);
         return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder); //TODO: Pretty sure return $this will be OK
     }
     
-    public function With_Simfile(IFile $simfile)
+    public function With_Simfile(IFile $simfile = null)
     {
         $this->_simfileBuilder->With_Simfile($simfile);
+        return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
+    }
+    
+    public function With_PackId($packId = null)
+    {
+        $this->_simfileBuilder->With_PackId($packId);
         return new SimfileStepByStepBuilder_With_Steps($this->_simfileBuilder);
     }
     

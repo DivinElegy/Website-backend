@@ -10,6 +10,8 @@ use Services\IZipParser;
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
+use Domain\Entities\StepMania\ISimfile;
+use Domain\Entities\StepMania\IPack;
 
 class SimfileController implements IDivineController
 {
@@ -103,19 +105,25 @@ class SimfileController implements IDivineController
             $zipParser->parse($file);
             
             //save the actual zip in the db
-            //$this->_fileRepository->save($file);  
-            foreach($zipParser->simfiles() as $simfile)
-            {
-                $this->_fileRepository->save($simfile->getBanner());
-                $this->_fileRepository->save($simfile->getSimfile());
-                $this->_simfileRepository->save($simfile);
-            }
+            $this->_fileRepository->save($file);  
             
             if($zipParser->isPack())
             {
+                //XXX: Tricky! pack() uses packbuilder and so returns a new pack each time.
+                //I tried to be clever and call pack() multiple times thinking I was getting the same
+                //object. Should I cache it in zipparser?
                 $pack = $zipParser->pack();
                 $this->_fileRepository->save($pack->getBanner());
                 $this->_packRepository->save($pack);
+            }
+            
+            foreach($zipParser->simfiles() as $simfile)
+            {   
+                $banner = $simfile->getBanner() ? $this->_fileRepository->save($simfile->getBanner()) : null;
+                $simfileZip = $simfile->getSimfile() ? $this->_fileRepository->save($simfile->getSimfile()) : null;
+
+                if(isset($pack)) $simfile->addToPack($pack);
+                $this->_simfileRepository->save($simfile);
             }
         }
     }

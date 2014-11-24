@@ -2,6 +2,7 @@
 
 namespace Domain\Entities\StepMania;
 
+use Domain\Entities\IFile;
 use Domain\Entities\StepMania\Pack;
 use Domain\Entities\IUser;
 

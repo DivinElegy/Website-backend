@@ -71,7 +71,7 @@ class PackStepByStepBuilder_With_Simfiles extends AbstractPackStepByStepBuilder 
 {
     public function With_Banner(IFile $banner)
     {
-        $this->_packBuilder->With_File($banner);
+        $this->_packBuilder->With_Banner($banner);
         return $this;
     }
     
@@ -83,7 +83,7 @@ class PackStepByStepBuilder_With_Simfiles extends AbstractPackStepByStepBuilder 
 
     public function build()
     {
-        return $this->_simfileBuilder
+        return $this->_packBuilder
                     ->build();
     }
 }

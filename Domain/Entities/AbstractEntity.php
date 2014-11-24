@@ -2,6 +2,7 @@
 
 namespace Domain\Entities;
 
+use Exception;
 use Domain\Entities\IDivineEntity;
 
 abstract class AbstractEntity implements IDivineEntity

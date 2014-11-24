@@ -17,7 +17,7 @@ class PackTestController implements IDivineController
     }
     
     public function indexAction() {
-        $pack = $this->_packRepository->findById(1);
+        $pack = $this->_packRepository->findById(10);
 
         echo '<pre>';
         print_r($pack);

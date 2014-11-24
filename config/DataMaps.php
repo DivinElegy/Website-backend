@@ -22,6 +22,7 @@ return [
             'bgChanges' => DataAccess\Int('bg_changes', 'hasBgChanges'),
             'banner' => DataAccess\Entity('File', 'getBanner', 'banner_file'),
             'simfile' => DataAccess\Entity('File', 'getSimfile', 'simfile_file'),
+            'packId' => DataAccess\Int('pack_id', 'getPackId'),
             'steps' => DataAccess\VOArray('StepChart', 'getSteps')
         ]
     ],

@@ -19,7 +19,7 @@ class StepChart implements IStepChart
     function __construct(
         DanceMode $mode,
         Difficulty $difficulty,
-        StepArtist $artist,
+        StepArtist $artist = null,
         $rating
     ) {
         $this->mode = $mode;

@@ -3,6 +3,7 @@
 namespace Domain\Entities\StepMania;
 
 use Domain\VOs\StepMania\IStepChart;
+use Domain\Entities\StepMania\IPack;
 use Domain\Entities\IDivineEntity;
 
 interface ISimfile extends IDivineEntity
@@ -17,7 +18,8 @@ interface ISimfile extends IDivineEntity
     public function hasBgChanges();
     public function getBanner();
     public function getSimfile();
-        
+    public function addToPack(IPack $pack);
     public function addStepChart(IStepChart $stepChart);
     public function getSteps();
+    public function getPackId();
 }

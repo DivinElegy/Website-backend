@@ -56,6 +56,8 @@ class PackBuilder implements IPackBuilder
     {
         return $this->_packFactory->createInstance($this->_title,
                                                    $this->_uploader,
-                                                   $this->_simfiles);
+                                                   $this->_simfiles,
+                                                   $this->_banner,
+                                                   $this->_file);
     }
 }

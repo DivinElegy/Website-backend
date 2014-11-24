@@ -21,6 +21,7 @@ interface ISimfileFactory
         $bgChanges,
         IFile $banner,
         IFile $simfile,
+        $packId = null,
         array $steps
     );
 }
@@ -38,6 +39,7 @@ class SimfileFactory implements ISimfileFactory
         $bgChanges,
         IFile $banner = null,
         IFile $simfile = null,
+        $packId = null,
         array $steps
     ) {
         return new Simfile(
@@ -51,6 +53,7 @@ class SimfileFactory implements ISimfileFactory
             $bgChanges,
             $banner,
             $simfile,
+            $packId,
             $steps
         );
     }

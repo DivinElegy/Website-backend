@@ -22,6 +22,7 @@ class SimfileBuilder implements ISimfileBuilder
     private $_bgChanges;
     private $_banner;
     private $_simfile;
+    private $_packId;
     private $_steps;
     
     //override parent
@@ -70,13 +71,19 @@ class SimfileBuilder implements ISimfileBuilder
         return $this;
     }
     
-    public function With_Banner(IFile $banner) {
+    public function With_Banner(IFile $banner = null) {
         $this->_banner = $banner;
         return $this;
     }
     
-    public function With_Simfile(IFile $simfile) {
+    public function With_Simfile(IFile $simfile = null) {
         $this->_simfile = $simfile;
+        return $this;
+    }
+    
+    public function With_PackId($packId = null)
+    {
+        $this->_packId = $packId;
         return $this;
     }
     
@@ -97,6 +104,7 @@ class SimfileBuilder implements ISimfileBuilder
                                      $this->_bgChanges,
                                      $this->_banner,
                                      $this->_simfile,
+                                     $this->_packId,
                                      $this->_steps);
     }
 }

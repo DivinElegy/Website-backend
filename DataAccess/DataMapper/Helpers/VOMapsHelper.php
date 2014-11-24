@@ -48,10 +48,11 @@ class VOMapsHelper
     {
         $className = $maps[$this->_voName]['class'];
         $table = $maps[$this->_voName]['table'];
-
+        
         // If the table we already have contains the id of a row we need in
         // another table        
-        if(isset($row[$this->_tableName . '_id'])) {
+        //if(isset($row[$this->_tableName . '_id'])) {
+        if(array_key_exists($this->_tableName . '_id', $row)) { //this is a better choice as somtimes the array key is set, but is equal to null, and isset doesn't like that
             $join_id = $row[$this->_tableName . '_id'];
             $statement = $db->prepare(sprintf('SELECT * from %s WHERE id=%u',
                 $table,

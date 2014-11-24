@@ -125,7 +125,7 @@ class SimfileParser implements ISimfileParser
         return new \Domain\VOs\StepMania\StepChart(
             new \Domain\VOs\StepMania\DanceMode($stepData[0]),
             new \Domain\VOs\StepMania\Difficulty($stepData[2]),
-            new \Domain\VOs\StepMania\StepArtist($stepData[1]),
+            empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist($stepData[1]),
             $stepData[3]
         );
     }
