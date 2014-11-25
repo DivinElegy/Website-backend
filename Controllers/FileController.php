@@ -30,25 +30,9 @@ class FileController implements IDivineController
     // list simfiles
     public function serveBannerAction($hash)
     {
-        if($hash == 'default')
-        {        
-            $file = '../files/banners/default.png';
-            $this->_response->setHeader('Content-Type', 'image/png')
-                            ->setHeader('Content-Length', filesize($file))
-                            ->setBody(file_get_contents($file))
-                            ->sendResponse();
-        }
-        
         $file = $this->_fileRepository->findByHash($hash);
-        
-        if(!$file)
-        {
-            $this->_response->setHeader('HTTP/1.0 404 Not Found', 'Nothing to see here')
-                            ->setBody('Move along.')
-                            ->sendResponse();
-            
-            return;
-        }
+        if($hash == 'default') $this->serveDefaultBanner();
+        if(!$file) $this->notFound();
                 
         $match = reset(glob('../files/' . $file->getPath() . '/' . $file->getHash() . '.*'));
         
@@ -56,5 +40,23 @@ class FileController implements IDivineController
                         ->setHeader('Content-Length', $file->getSize())
                         ->setBody(file_get_contents($match))
                         ->sendResponse();
+    }
+    
+    private function serveDefaultBanner()
+    {
+        $file = '../files/banners/default.png';
+        $this->_response->setHeader('Content-Type', 'image/png')
+                        ->setHeader('Content-Length', filesize($file))
+                        ->setBody(file_get_contents($file))
+                        ->sendResponse();
+        exit();
+    }
+    
+    private function notFound()
+    {
+        $this->_response->setHeader('HTTP/1.0 404 Not Found', 'Nothing to see here')
+                        ->setBody('Move along.')
+                        ->sendResponse();
+        exit();
     }
 }
