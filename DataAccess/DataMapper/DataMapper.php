@@ -57,22 +57,31 @@ class DataMapper implements IDataMapper
     {
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
         $mergeMap = array();
-        
-        echo 'pre flattened: <br />';
-        echo '<pre>';
-        print_r($queries);
-        echo '</pre>';
-        
         $flattened = array();
-        $flattened_tables = array();
+
         foreach($queries as $index => $query)
         {
             $this_table = $query['table'];
             $this_columns = $query['columns'];
-            $flatten = true;
+            
+            if(!array_key_exists($index, $mergeMap)) {
+                $prepared = isset($query['prepared']) ? $query['prepared'] : null;
+                $id = isset($query['id']) ? $query['id'] : null;
+
+                $flattened[] = array(
+                    'columns' => $this_columns,
+                    'table' => $this_table,
+                    'prepared' => $prepared,
+                    'id' => $id
+                );
+            }
+            
             for($i = $index+1; $i<count($queries); $i++)
             {
-                if($queries[$i]['table'] == $this_table && !in_array($queries[$i]['table'], $flattened_tables) && !isset($query['id'])) //only merge create queries, updates are fine to run multiple times
+                if(
+                    $queries[$i]['table'] == $this_table &&
+                    !array_key_exists($i, $mergeMap) &&
+                    !isset($query['id'])) //only merge create queries, updates are fine to run multiple times
                 {
                     //XXX: This whole biz is tricky. Basically the problem is that when creating a new simfile,
                     //the datamapper spews out a bunch of create queries. When parsing a simfile for example, there can
@@ -82,33 +91,12 @@ class DataMapper implements IDataMapper
                     //check if the arrays are equal as well, which is what this does.
                     if($this_columns === $queries[$i]['columns'])
                     {
-                        $this_columns = array_merge($this_columns, $queries[$i]['columns']);
                         //need to keep track of what we merged as future queries might reference the old ids.
                         $mergeMap[$i] = $index;
-                    } else {
-                        //we need to add these unmerged ones here as further down we record that anything to
-                        //do with this table has been sorted out.
-//                        $prepared = isset($queries[$i]['prepared']) ? $queries[$i]['prepared'] : null;
-//                        $id = isset($queries[$i]['id']) ? $queries[$i]['id'] : null;
-//                        $flattened[] = array('columns' => $queries[$i]['columns'], 'table' => $queries[$i]['table'], 'prepared' => $prepared, 'id' => $id);
-                        $flatten = false;
                     }
                 }
             }
-            
-            if(!in_array($this_table, $flattened_tables))
-            {
-                if($flatten) $flattened_tables[] = $this_table;
-                $prepared = isset($query['prepared']) ? $query['prepared'] : null;
-                $id = isset($query['id']) ? $query['id'] : null;
-                $flattened[] = array('columns' => $this_columns, 'table' => $this_table, 'prepared' => $prepared, 'id' => $id);
-            }
         }
-        
-        echo 'flattened: <br />';
-        echo '<pre>';
-        print_r($flattened);
-        echo '</pre>';
         
         $queries = array();
                 
