@@ -58,7 +58,7 @@ class Pack extends AbstractEntity implements IPack
     
     public function getSimfiles()
     {
-        return $this->_file;
+        return $this->_simfiles;
     }
     
     public function getTitle()
@@ -81,8 +81,8 @@ class Pack extends AbstractEntity implements IPack
         $artists = array();
         foreach($simfile->getSteps() as $steps)
         {
-            /* @var $steps \Domain\VOs\StepMania\IStepChart */
-            if(!in_array($steps->getArtist(), $artists)) $artists[] = $steps->getArtist ();
+            /* @var $steps \Domain\VOs\StepMania\StepChart */
+            if($steps->getArtist()->getTag() && !in_array($steps->getArtist()->getTag(), $artists)) $artists[] = $steps->getArtist()->getTag();
         }
         
         return $artists;

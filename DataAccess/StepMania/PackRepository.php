@@ -26,6 +26,15 @@ class PackRepository implements IPackRepository
         return reset($result);
     }
     
+    public function findAll()
+    {
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('id', '>', 0);
+        
+        $result = $this->_dataMapper->map('Pack', $queryBuilder);
+        return $result;
+    }
+    
     public function findRange($id, $limit)
     {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();

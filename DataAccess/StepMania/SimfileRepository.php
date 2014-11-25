@@ -22,16 +22,24 @@ class SimfileRepository implements ISimfileRepository
     
     public function findById($id) {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();
-        $queryBuilder->where('id', '=', $id);
+        $queryBuilder->where('id', '=', $id)->null('pack_id');
              
         $result = $this->_dataMapper->map('Simfile', $queryBuilder);
         return reset($result);
     }
     
+    public function findAll()
+    {
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('id', '>', 0)->null('pack_id');
+        $result = $this->_dataMapper->map('Simfile', $queryBuilder);
+        return $result;
+    }
+    
     public function findRange($id, $limit)
     {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();
-        $queryBuilder->where('id', '>=', $id)->limit($limit);
+        $queryBuilder->where('id', '>=', $id)->null('pack_id')->limit($limit);
                 
         return $this->_dataMapper->map('Simfile', $queryBuilder);
     }
@@ -51,6 +59,8 @@ class SimfileRepository implements ISimfileRepository
         {
             $constraints->applyTo($queryBuilder);
         }
+        
+        $queryBuilder->null('pack_id');
         
         return $this->_dataMapper->map('Simfile', $queryBuilder);
     }

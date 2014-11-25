@@ -12,13 +12,7 @@ return [
         'controller' => 'Simfile',
         'action' => 'upload'
     ],
-    
-    //XXX: Test, delete later
-    '/simfiles/pack' => [
-        'methods' => ['GET'],
-        'controller' => 'PackTest',
-    ],
-        
+            
     '/simfiles/argTest/:testarg' => [
         'methods' => ['GET'],
         'controller' => 'Simfile',

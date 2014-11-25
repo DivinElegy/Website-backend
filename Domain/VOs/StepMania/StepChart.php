@@ -2,9 +2,9 @@
 
 namespace Domain\VOs\StepMania;
 
-use Domain\VOs\StepMania\DanceMode;
-use Domain\VOs\StepMania\Difficulty;
-use Domain\VOs\StepMania\StepArtist;
+use Domain\VOs\StepMania\IDanceMode;
+use Domain\VOs\StepMania\IDifficulty;
+use Domain\VOs\StepMania\IStepArtist;
 
 class StepChart implements IStepChart
 {   
@@ -17,9 +17,9 @@ class StepChart implements IStepChart
     protected $artist;
             
     function __construct(
-        DanceMode $mode,
-        Difficulty $difficulty,
-        StepArtist $artist = null,
+        IDanceMode $mode,
+        IDifficulty $difficulty,
+        IStepArtist $artist = null,
         $rating
     ) {
         $this->mode = $mode;

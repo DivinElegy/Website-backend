@@ -51,6 +51,11 @@ class QueryBuilder implements IQueryBuilder
         return $this;
     }
     
+    public function null($columnName)
+    {
+        return $this->where($columnName, 'is', null);
+    }
+    
     private function applyJoinClauses()
     {
         foreach($this->_joinClauses as $joinClause)
@@ -74,6 +79,9 @@ class QueryBuilder implements IQueryBuilder
                     break;
                 case 'string':
                     $this->_queryString .= sprintf("%s %s '%s'", $columnName, $columnValue['operator'], $columnValue['value']) . ' AND ';
+                    break;
+                case 'NULL':
+                    $this->_queryString .= sprintf("%s is null", $columnName) . ' AND ';
                     break;
             }
             

@@ -14,5 +14,6 @@ interface IQueryBuilder
     public function limit($start, $end);
     public function where($column, $operator, $value);
     public function join($type, $tableA, $columnA, $tableB, $columnB);
+    public function null($columnName);
     public function buildQuery();
 }

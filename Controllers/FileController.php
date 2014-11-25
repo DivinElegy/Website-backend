@@ -30,6 +30,15 @@ class FileController implements IDivineController
     // list simfiles
     public function serveBannerAction($hash)
     {
+        if($hash == 'default')
+        {        
+            $file = '../files/banners/default.png';
+            $this->_response->setHeader('Content-Type', 'image/png')
+                            ->setHeader('Content-Length', filesize($file))
+                            ->setBody(file_get_contents($file))
+                            ->sendResponse();
+        }
+        
         $file = $this->_fileRepository->findByHash($hash);
         
         if(!$file)
@@ -40,8 +49,9 @@ class FileController implements IDivineController
             
             return;
         }
-        
+                
         $match = reset(glob('../files/' . $file->getPath() . '/' . $file->getHash() . '.*'));
+        
         $this->_response->setHeader('Content-Type', $file->getMimetype())
                         ->setHeader('Content-Length', $file->getSize())
                         ->setBody(file_get_contents($match))

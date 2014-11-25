@@ -18,7 +18,20 @@ class FileRepository implements IFileRepository
     
     public function findById($id) {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();
-        $queryBuilder->where('id', '=', "$id");
+        $queryBuilder->where('id', '=', $id);
+        
+        $results = $this->_dataMapper->map(
+            'File',
+            $queryBuilder
+        );
+        
+        return reset($results);
+    }
+    
+    public function findAll()
+    {
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('id', '>', 0);
         
         return $this->_dataMapper->map(
             'File',

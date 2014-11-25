@@ -49,43 +49,33 @@ class SimfileController implements IDivineController
     public function listAction()
     {
         /* @var $simfile Domain\Entities\StepMania\ISimfile */
-        $simfiles = $this->_simfileRepository->findRange(1, 10);
-        $returnArray = array();
+        $simfiles = $this->_simfileRepository->findAll();
+        $packs = $this->_packRepository->findAll();
+        $simfileArray = array();
+        $packArray = array();
         
         foreach($simfiles as $simfile)
         {
-            $singleSteps = array();
-            $doubleSteps = array();
-            
-            foreach($simfile->getSteps() as $steps)
-            {   
-                $stepDetails = array(
-                    'artist' => $steps->getArtist()->getTag(),
-                    'difficulty' => $steps->getDifficulty()->getITGName(),
-                    'rating' => $steps->getRating()
-                );
-                
-                if($steps->getMode()->getPrettyName() == 'Single')
-                {
-                    $singleSteps[] = $stepDetails;
-                } else {
-                    $doubleSteps[] = $stepDetails;
-                }
+            $simfileArray[] = $this->simfileToArray($simfile);
+        }
+        
+        foreach($packs as $pack)
+        {
+            $packSimfiles = array();
+            foreach($pack->getSimfiles() as $simfile)
+            {
+                $packSimfiles[] = $this->simfileToArray($simfile);
             }
 
-            $returnArray[] = array(
-                'title' => $simfile->getTitle(),
-                'artist' => $simfile->getArtist()->getName(),
-                'steps' => array(
-                    'single' => $singleSteps,
-                    'double' => $doubleSteps
-                ),
-                'bgChanges' => $simfile->hasBgChanges() ? 'Yes' : 'No',
-                'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
-                'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
-                'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default'
+            $packArray[] = array(
+                'title'=> $pack->getTitle(),
+                'contributors' => $pack->getContributors(),
+                'simfiles' => $packSimfiles,
+                'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default'
             );
         }
+        
+        $returnArray = array('simfiles' => $simfileArray, 'packs' => $packArray);
         
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody(json_encode($returnArray))
@@ -126,5 +116,40 @@ class SimfileController implements IDivineController
                 $this->_simfileRepository->save($simfile);
             }
         }
+    }
+    
+    private function simfileToArray(ISimfile $simfile)
+    {
+        $singleSteps = array();
+        $doubleSteps = array();
+
+        foreach($simfile->getSteps() as $steps)
+        {   
+            $stepDetails = array(
+                'artist' => $steps->getArtist()->getTag(),
+                'difficulty' => $steps->getDifficulty()->getITGName(),
+                'rating' => $steps->getRating()
+            );
+
+            if($steps->getMode()->getPrettyName() == 'Single')
+            {
+                $singleSteps[] = $stepDetails;
+            } else {
+                $doubleSteps[] = $stepDetails;
+            }
+        }
+
+        return array(
+            'title' => $simfile->getTitle(),
+            'artist' => $simfile->getArtist()->getName(),
+            'steps' => array(
+                'single' => $singleSteps,
+                'double' => $doubleSteps
+            ),
+            'bgChanges' => $simfile->hasBgChanges() ? 'Yes' : 'No',
+            'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
+            'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
+            'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default'
+        );
     }
 }
