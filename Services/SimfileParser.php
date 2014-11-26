@@ -67,6 +67,7 @@ class SimfileParser implements ISimfileParser
         if($displayBpm)
         {
             $bpmRange = explode(":",$displayBpm);
+            $bpmRange[1] = @$bpmRange[1] ?: $bpmRange[0];
         } else {
             $bpms = $this->extractKey('BPMS');
             $bpmRange = $this->parseBpms($bpms);

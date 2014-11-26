@@ -103,7 +103,7 @@ class SimfileController implements IDivineController
                 //I tried to be clever and call pack() multiple times thinking I was getting the same
                 //object. Should I cache it in zipparser?
                 $pack = $zipParser->pack();
-                $this->_fileRepository->save($pack->getBanner());
+                $packBanner = $pack->getBanner() ? $this->_fileRepository->save($pack->getBanner()) : null;
                 $this->_packRepository->save($pack);
             }
             

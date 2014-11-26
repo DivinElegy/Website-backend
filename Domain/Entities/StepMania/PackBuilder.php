@@ -29,7 +29,7 @@ class PackBuilder implements IPackBuilder
         return $this;
     }
     
-    public function With_Banner(IFile $banner)
+    public function With_Banner(IFile $banner = null)
     {
         $this->_banner = $banner;
     }

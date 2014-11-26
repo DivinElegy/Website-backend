@@ -23,7 +23,7 @@ interface IPackStepByStepBuilder_With_Uploader
 
 interface IPackStepByStepBuilder_With_Simfiles
 {
-    public function With_Banner(IFile $banner);
+    public function With_Banner(IFile $banner = null);
     public function With_File(IFile $file);
     public function build();
 }
@@ -69,7 +69,7 @@ class PackStepByStepBuilder_With_Uploader extends AbstractPackStepByStepBuilder 
 
 class PackStepByStepBuilder_With_Simfiles extends AbstractPackStepByStepBuilder implements IPackStepByStepBuilder_With_Simfiles
 {
-    public function With_Banner(IFile $banner)
+    public function With_Banner(IFile $banner = null)
     {
         $this->_packBuilder->With_Banner($banner);
         return $this;
