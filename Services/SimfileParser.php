@@ -46,18 +46,19 @@ class SimfileParser implements ISimfileParser
     
     public function stops()
     {
-        $stops = $this->extractKey('STOPS') ? 'Yes' : 'No';
-        if(!$stops) throw new Exception ('Invalid SM file. STOPS missing');
+        $stops = $this->extractKey('STOPS');
+        if($stops === false) throw new Exception ('Invalid SM file. STOPS missing');
         
-        return $stops;
+        return (bool)$stops;
     }
     
     public function fgChanges()
     {
-        $fgChanges = $this->extractKey('FGCHANGES') ? 'Yes' : 'No';
-        if(!$fgChanges) throw new Exception ('Invalid SM file. FGCHANGES missing');
+        $fgChanges = $this->extractKey('FGCHANGES');
+        //XXX: Looks like fgChanges is allowed to be missing.
+        //if($fgChanges === false) throw new Exception ('Invalid SM file. FGCHANGES missing');
         
-        return $fgChanges;
+        return (bool)$fgChanges;
     }
     
     public function bpm()
@@ -79,18 +80,20 @@ class SimfileParser implements ISimfileParser
     
     public function bgChanges()
     {
-        $bgChanges = $this->extractKey('BGCHANGES') ? 'Yes' : 'No';
-        if(!$bgChanges) throw new Exception ('Invalid SM file. BGCHANGES missing');
+        $bgChanges = $this->extractKey('BGCHANGES');
+        if($bgChanges === false) throw new Exception ('Invalid SM file. BGCHANGES missing');
         
-        return $bgChanges;
+        return (bool)$bgChanges;
     }
     
     public function bpmChanges() 
     {
-        $bpmChanges = $this->extractKey('BPMS') ? 'Yes' : 'No';
-        if(!$bpmChanges) throw new Exception ('Invalid SM file. BPMS missing');
+        $bpms = $this->extractKey('BPMS');
+        if(!$bpms) throw new Exception ('Invalid SM file. BPMS missing');
         
-        return $bpmChanges;
+        $bpmRange = $this->parseBpms($bpms);
+        //XXX: We have bpm changes when the high and low bpms are different.
+        return $bpmRange[0] != $bpmRange[1];
     }
     
     public function subtitle()
@@ -140,6 +143,8 @@ class SimfileParser implements ISimfileParser
             $pos = strpos($line, '#' . $key . ':');
             if ($pos !== false) return trim(substr($line, $pos + strlen($key) + 2));
         }
+        
+        return false;
     }
     
     private function parseBpms($bpms)
