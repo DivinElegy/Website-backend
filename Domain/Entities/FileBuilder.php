@@ -13,6 +13,7 @@ class FileBuilder implements IFileBuilder
     private $_mimetype;
     private $_size;
     private $_date;
+    private $_mirrors;
     
     public function __construct(IFileFactory $fileFactory)
     {
@@ -49,6 +50,11 @@ class FileBuilder implements IFileBuilder
         $this->_date = $date;
     }
     
+    public function With_Mirrors(array $mirrors = null)
+    {
+        $this->_mirrors = $mirrors;
+    }
+    
     public function build()
     {
         return $this->_fileFactory
@@ -58,6 +64,7 @@ class FileBuilder implements IFileBuilder
                             $this->_filename,
                             $this->_mimetype,
                             $this->_size,
-                            $this->_date);
+                            $this->_date,
+                            $this->_mirrors);
     }
 }

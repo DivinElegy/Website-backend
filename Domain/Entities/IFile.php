@@ -2,6 +2,8 @@
 
 namespace Domain\Entities;
 
+use Domain\VOs\IFileMirror;
+
 interface IFile extends IDivineEntity
 {
     public function getPath();
@@ -10,4 +12,6 @@ interface IFile extends IDivineEntity
     public function getMimetype();
     public function getSize();
     public function getUploadDate();
+    public function getMirrors();
+    public function addMirror(IFileMirror $mirror);
 }

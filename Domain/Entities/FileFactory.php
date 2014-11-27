@@ -12,7 +12,8 @@ interface IFileFactory
         $filename,
         $mimetype,
         $size,
-        $uploadDate
+        $uploadDate,
+        array $mirrors = null
     );
 }
 
@@ -24,15 +25,17 @@ class FileFactory implements IFileFactory
         $filename,
         $mimetype,
         $size,
-        $uploadDate
+        $uploadDate,
+        array $mirrors = null
     ) {
         return new File(
-        $hash,
-        $path,
-        $filename,
-        $mimetype,
-        $size,
-        $uploadDate
+            $hash,
+            $path,
+            $filename,
+            $mimetype,
+            $size,
+            $uploadDate,
+            $mirrors
         );
     }
 }

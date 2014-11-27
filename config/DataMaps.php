@@ -137,7 +137,16 @@ return [
             'filename' => DataAccess\Varchar('filename'),
             'mimetype' => DataAccess\Varchar('mimetype'),
             'size' => DataAccess\Int('size'),
-            'uploadDate' => DataAccess\Int('uploaded', 'getUploadDate')
+            'uploadDate' => DataAccess\Int('uploaded', 'getUploadDate'),
+            'mirrors' => DataAccess\VOArray('FileMirror', 'getMirrors')
+        ]
+    ],
+    
+    'FileMirror' => [
+        'class' => 'Domain\VOs\FileMirror',
+        'table' => 'mirrors',
+        'maps' => [
+            'uri' => DataAccess\Varchar('uri')
         ]
     ]
 ];

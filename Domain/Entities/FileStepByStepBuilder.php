@@ -36,6 +36,7 @@ interface IFileStepByStepBuilder_With_Size
 
 interface IFileStepByStepBuilder_With_UploadDate
 {
+    public function With_Mirrors(array $mirrors = null);
     public function build();
 }
 
@@ -100,6 +101,11 @@ class FileStepByStepBuilder_With_Size extends AbstractFileStepByStepBuilder impl
 
 class FileStepByStepBuilder_With_UploadDate extends AbstractFileStepByStepBuilder implements IFileStepByStepBuilder_With_UploadDate
 {
+    public function With_Mirrors(array $mirrors = null) {
+        $this->_fileBuilder->With_Mirrors($mirrors);
+        return new FileStepByStepBuilder_With_UploadDate($this->_fileBuilder);
+    }
+    
     public function build() {
         return $this->_fileBuilder
                     ->build();

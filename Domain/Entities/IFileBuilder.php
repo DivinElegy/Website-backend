@@ -10,5 +10,6 @@ interface IFileBuilder
     public function With_Mimetype($mimetype);
     public function With_Size($size);
     public function With_UploadDate($date);
+    public function With_Mirrors(array $mirrors = null);
     public function build();
 }

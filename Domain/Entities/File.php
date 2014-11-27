@@ -3,6 +3,7 @@
 namespace Domain\Entities;
 
 use Domain\Entities\AbstractEntity;
+use Domain\VOs\IFileMirror;
 
 class File extends AbstractEntity implements IFile
 {    
@@ -12,6 +13,7 @@ class File extends AbstractEntity implements IFile
     private $_mimetype;
     private $_size;
     private $_uploadDate;
+    private $_mirrors;
     
     public function __construct(
         $hash,
@@ -19,7 +21,8 @@ class File extends AbstractEntity implements IFile
         $filename,
         $mimetype,
         $size,
-        $uploadDate
+        $uploadDate,
+        array $mirrors = null
     ) {
         $this->_hash = $hash;
         $this->_path = $path;
@@ -27,6 +30,17 @@ class File extends AbstractEntity implements IFile
         $this->_mimetype = $mimetype;
         $this->_size = $size;
         $this->_uploadDate = $uploadDate;
+        
+        if($mirrors)
+        {
+            foreach($mirrors as $mirror) {
+                if(!$mirror instanceof IFileMirror) {
+                    throw new InvalidStepChartException(sprintf('Invalid FileMirror array. All array elements must be an instance of IFileMirror.'));
+                }
+            }
+
+            $this->_mirrors = $mirrors;
+        }
     }
     
     public function getFilename() 
@@ -57,5 +71,15 @@ class File extends AbstractEntity implements IFile
     public function getUploadDate()
     {
         return $this->_uploadDate;
+    }
+    
+    public function getMirrors()
+    {
+        return $this->_mirrors;
+    }
+    
+    public function addMirror(IFileMirror $mirror)
+    {
+        $this->_mirrors[] = $mirror;
     }
 }

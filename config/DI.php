@@ -37,6 +37,7 @@ return [
     'Services\ISimfileParser'                             => DI\object('Services\SimfileParser'),
     'Services\IZipParser'                                 => DI\object('Services\ZipParser'),
     'Services\IBannerExtracter'                           => DI\object('Services\BannerExtracter'),
+    'Services\ISMOMatcher'                                => DI\object('Services\SMOMatcher'),
     
     //DA
     'DataAccess\StepMania\ISimfileRepository'             => DI\object('DataAccess\StepMania\SimfileRepository'),

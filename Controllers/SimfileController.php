@@ -7,11 +7,13 @@ use Services\Http\IHttpResponse;
 use Services\Uploads\IUploadManager;
 use Services\IUserSession;
 use Services\IZipParser;
+use Services\ISMOMatcher;
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
 use Domain\Entities\StepMania\ISimfile;
-use Domain\Entities\StepMania\IPack;
+use Domain\Entities\IFile;
+use Domain\VOs\IFileMirror;
 
 class SimfileController implements IDivineController
 {
@@ -22,6 +24,7 @@ class SimfileController implements IDivineController
     private $_uploadManager;
     private $_userSession;
     private $_zipParser;
+    private $_smoMatcher;
     
     public function __construct(
         IHttpResponse $response,
@@ -30,7 +33,8 @@ class SimfileController implements IDivineController
         IPackRepository $packRepository,
         IFileRepository $fileRepository,
         IUserSession $userSession,
-        IZipParser $zipParser
+        IZipParser $zipParser,
+        ISMOMatcher $smoMatcher
     ) {
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
@@ -39,6 +43,7 @@ class SimfileController implements IDivineController
         $this->_fileRepository = $fileRepository;
         $this->_userSession = $userSession;
         $this->_zipParser = $zipParser;
+        $this->_smoMatcher = $smoMatcher;
     }
     
     public function indexAction() {
@@ -67,11 +72,21 @@ class SimfileController implements IDivineController
                 $packSimfiles[] = $this->simfileToArray($simfile);
             }
 
+            $packMirrors = array();
+            if($pack->getFile()->getMirrors())
+            {
+                foreach($pack->getFile()->getMirrors() as $mirror)
+                {
+                    $packMirrors = $mirror->getUri();
+                }
+            }
+            
             $packArray[] = array(
                 'title'=> $pack->getTitle(),
                 'contributors' => $pack->getContributors(),
                 'simfiles' => $packSimfiles,
-                'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default'
+                'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
+                'mirrors' => $packMirrors
             );
         }
         
@@ -93,8 +108,9 @@ class SimfileController implements IDivineController
         {
             $zipParser = $this->_zipParser;
             $zipParser->parse($file);
-            
+                        
             //save the actual zip in the db
+            $this->findAndAddSmoMirror($file);
             $this->_fileRepository->save($file);  
             
             if($zipParser->isPack())
@@ -115,6 +131,18 @@ class SimfileController implements IDivineController
                 if(isset($pack)) $simfile->addToPack($pack);
                 $this->_simfileRepository->save($simfile);
             }
+        }
+    }
+    
+    private function findAndAddSmoMirror(IFile $file)
+    {
+        $basename = pathinfo($file->getFilename(), PATHINFO_FILENAME);
+        $match = $this->_smoMatcher->match($basename, $file->getSize());
+        
+        //XXX: Direct instantiation of FileMirror bad?
+        if($match && $match['confidence'] > 90)
+        {
+            $file->addMirror(new \Domain\VOs\FileMirror($match['href']));
         }
     }
     
