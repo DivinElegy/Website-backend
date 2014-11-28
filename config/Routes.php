@@ -7,6 +7,12 @@ return [
         'action' => 'list'
     ],
     
+    //TODO: test controller, delete later
+    '/downloadtest' => [
+        'methods' => ['GET'],
+        'controller' => 'downloadTest'
+    ],
+    
     '/simfiles/upload' => [
         'methods' => ['POST'],
         'controller' => 'Simfile',

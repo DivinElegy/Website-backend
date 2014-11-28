@@ -42,6 +42,7 @@ return [
     //DA
     'DataAccess\StepMania\ISimfileRepository'             => DI\object('DataAccess\StepMania\SimfileRepository'),
     'DataAccess\StepMania\IPackRepository'                => DI\object('DataAccess\StepMania\PackRepository'),
+    'DataAccess\IDownloadRepository'                      => DI\object('DataAccess\DownloadRepository'),
     'DataAccess\IUserRepository'                          => DI\object('DataAccess\UserRepository'),
     'DataAccess\IFileRepository'                          => DI\object('DataAccess\FileRepository'),
     'DataAccess\IDatabaseFactory'                         => DI\object('DataAccess\DatabaseFactory')

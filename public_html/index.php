@@ -7,6 +7,9 @@ header("Access-Control-Allow-Origin: http://roll.divinelegy.meeples:8000");
 
 require_once('../vendor/autoload.php');
 
+// Everything time related should be UTC+0 based
+date_default_timezone_set('UTC');
+
 // Set up the DI container
 $containerBuilder = new DI\ContainerBuilder();
 $containerBuilder->addDefinitions('../config/DI.php');

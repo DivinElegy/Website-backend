@@ -149,5 +149,16 @@ return [
             'uri' => DataAccess\Varchar('uri'),
             'source' => DataAccess\Varchar('source')
         ]
+    ],
+    
+    'Download' => [
+        'class' => 'Domain\Entities\Download',
+        'table' => 'downloads',
+        'maps' => [
+            'user' => DataAccess\Entity('User'),
+            'file' => DataAccess\Entity('File'),
+            'timestamp' => DataAccess\Int('timestamp'),
+            'ip' => DataAccess\Varchar('ip')
+        ]
     ]
 ];
