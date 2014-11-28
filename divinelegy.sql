@@ -26,7 +26,24 @@ CREATE TABLE `artists` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=339 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `downloads`
+--
+
+DROP TABLE IF EXISTS `downloads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `downloads` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `file_id` mediumint(8) unsigned NOT NULL,
+  `user_id` mediumint(8) unsigned NOT NULL,
+  `timestamp` int(10) unsigned NOT NULL,
+  `ip` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +62,23 @@ CREATE TABLE `files` (
   `size` int(10) unsigned NOT NULL,
   `uploaded` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=267 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `mirrors`
+--
+
+DROP TABLE IF EXISTS `mirrors`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mirrors` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `uri` varchar(255) DEFAULT NULL,
+  `file_id` mediumint(8) unsigned NOT NULL,
+  `source` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,8 +93,9 @@ CREATE TABLE `packs` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `file_id` mediumint(8) unsigned DEFAULT NULL,
   `user_id` mediumint(8) unsigned NOT NULL,
+  `banner_file_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,7 +120,7 @@ CREATE TABLE `simfiles` (
   `simfile_file_id` mediumint(8) unsigned DEFAULT NULL,
   `pack_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=394 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,7 +135,7 @@ CREATE TABLE `step_artists` (
   `tag` varchar(255) NOT NULL,
   `user_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=146 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,9 +151,9 @@ CREATE TABLE `steps` (
   `mode` enum('dance-single','dance-double') NOT NULL,
   `rating` int(10) unsigned NOT NULL,
   `difficulty` enum('Beginner','Easy','Medium','Hard','Challenge','Edit') NOT NULL,
-  `step_artist_id` mediumint(8) unsigned NOT NULL,
+  `step_artist_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=439 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,6 +169,7 @@ CREATE TABLE `users` (
   `display_name` varchar(255) NOT NULL,
   `facebook_id` varchar(255) DEFAULT NULL,
   `auth_token` varchar(255) DEFAULT NULL,
+  `quota` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -165,4 +200,4 @@ CREATE TABLE `users_meta` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-11-17 16:49:39
+-- Dump completed on 2014-11-28 16:05:02
