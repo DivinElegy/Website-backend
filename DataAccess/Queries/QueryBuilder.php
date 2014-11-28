@@ -28,7 +28,7 @@ class QueryBuilder implements IQueryBuilder
     
     public function where($columnName, $operator, $value)
     {
-        $this->_whereClauses[$columnName] = array('operator' => $operator, 'value' => $value);
+        $this->_whereClauses[] = array('columnName' => $columnName, 'operator' => $operator, 'value' => $value);
         return $this;
     }
     
@@ -70,18 +70,18 @@ class QueryBuilder implements IQueryBuilder
     {
         $this->_queryString .= ' WHERE ';
         
-        foreach($this->_whereClauses as $columnName => $columnValue)
+        foreach($this->_whereClauses as $whereClause)
         {
-            switch(gettype($columnValue['value']))
+            switch(gettype($whereClause['value']))
             {
                 case 'integer':
-                    $this->_queryString .= sprintf("%s%s%u", $columnName, $columnValue['operator'], $columnValue['value']) . ' AND ';
+                    $this->_queryString .= sprintf("%s%s%u", $whereClause['columnName'], $whereClause['operator'], $whereClause['value']) . ' AND ';
                     break;
                 case 'string':
-                    $this->_queryString .= sprintf("%s %s '%s'", $columnName, $columnValue['operator'], $columnValue['value']) . ' AND ';
+                    $this->_queryString .= sprintf("%s %s '%s'", $whereClause['columnName'], $whereClause['operator'], $whereClause['value']) . ' AND ';
                     break;
                 case 'NULL':
-                    $this->_queryString .= sprintf("%s is null", $columnName) . ' AND ';
+                    $this->_queryString .= sprintf("%s is null", $whereClause['columnName']) . ' AND ';
                     break;
             }
             
