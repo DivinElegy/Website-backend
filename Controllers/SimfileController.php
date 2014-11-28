@@ -77,7 +77,7 @@ class SimfileController implements IDivineController
             {
                 foreach($pack->getFile()->getMirrors() as $mirror)
                 {
-                    $packMirrors = $mirror->getUri();
+                    $packMirrors[] = array('source' => $mirror->getSource(), 'uri' => $mirror->getUri());
                 }
             }
             
@@ -142,7 +142,7 @@ class SimfileController implements IDivineController
         //XXX: Direct instantiation of FileMirror bad?
         if($match && $match['confidence'] > 90)
         {
-            $file->addMirror(new \Domain\VOs\FileMirror($match['href']));
+            $file->addMirror(new \Domain\VOs\FileMirror($match['href'], 'Stepmania Online'));
         }
     }
     
@@ -167,7 +167,7 @@ class SimfileController implements IDivineController
             }
         }
 
-        return array(
+        return array(            
             'title' => $simfile->getTitle(),
             'artist' => $simfile->getArtist()->getName(),
             'steps' => array(
@@ -177,7 +177,8 @@ class SimfileController implements IDivineController
             'bgChanges' => $simfile->hasBgChanges() ? 'Yes' : 'No',
             'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
             'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
-            'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default'
+            'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default',
+            'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null
         );
     }
 }

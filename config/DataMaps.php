@@ -146,7 +146,8 @@ return [
         'class' => 'Domain\VOs\FileMirror',
         'table' => 'mirrors',
         'maps' => [
-            'uri' => DataAccess\Varchar('uri')
+            'uri' => DataAccess\Varchar('uri'),
+            'source' => DataAccess\Varchar('source')
         ]
     ]
 ];
