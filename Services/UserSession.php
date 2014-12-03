@@ -24,11 +24,7 @@ class UserSession implements IUserSession
     {
         return $this->_currentUser;
     }
-    
-    public function getCurrentUserQuota() {
-        ;
-    }
-    
+
     private function findToken()
     {        
         if($this->_request->isPost())

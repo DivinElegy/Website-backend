@@ -23,7 +23,6 @@ class DataMapper implements IDataMapper
     public function map($entityName, IQueryBuilder $queryBuilder)
     {
         $queryString = $queryBuilder->buildQuery();
-
         $statement = $this->_db->prepare(sprintf($queryString,
             $this->_maps[$entityName]['table']
         ));

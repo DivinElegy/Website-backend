@@ -13,5 +13,6 @@ interface IUserBuilder
     public function With_Tags(array $tags);
     public function With_FacebookId($id);
     public function With_YearsStepArtist($years);
+    public function With_Quota($quota);
     public function build();
 }

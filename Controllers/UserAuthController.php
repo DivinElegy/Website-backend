@@ -93,6 +93,7 @@ class UserAuthController implements IDivineController
                                                 ->With_Name(new \Domain\VOs\Name($firstName, $lastName))
                                                 ->With_Tags(array())
                                                 ->With_FacebookId($facebookId)
+                                                ->With_Quota(100000000) //XXX: quota is in bytes
                                                 ->build();
                 
         $this->_userRepository->save($newUser);

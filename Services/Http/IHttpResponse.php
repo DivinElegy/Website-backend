@@ -13,4 +13,5 @@ interface IHttpResponse
     public function getBody();
     public function isRedirect();
     public function sendResponse();
+    public function download($path);
 }

@@ -273,4 +273,15 @@ class Util
         }
         return null; 
     }
+    
+    public static function bytesToHumanReadable($bytes, $dec = 2)
+    {
+        if(!is_int($bytes)) throw new \Exception('Bytes must be an int.' . var_dump($bytes));
+     
+        //Shamelessly stolen from stackoverflow: http://stackoverflow.com/questions/15188033/human-readable-file-size
+        $size   = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+
+        return sprintf("%.{$dec}f", $bytes / pow(1000, $factor)) . @$size[$factor];
+    }
 }

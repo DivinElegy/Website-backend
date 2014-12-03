@@ -3,30 +3,20 @@
 namespace Controllers;
 
 use Controllers\IDivineController;
-use DataAccess\IDownloadRepository;
-use DataAccess\Queries\DownloadQueryConstraints;
-use DateTime;
+use Services\IUserQuota;
 
 class DownloadTestController implements IDivineController
 {
-    private $_downloadRepository;
+    private $_quotaManager;
     
     public function __construct(
-        IDownloadRepository $repository
+        IUserQuota $quotaManager
     ) {
-        $this->_downloadRepository = $repository;
+        $this->_quotaManager = $quotaManager;
     }
     
     public function indexAction() {
-        $start = new DateTime('0:00 today');
-        $end = new DateTime();
-        
-        $constraints = new DownloadQueryConstraints();
-        $constraints->inDateRange($start, $end);
-        $downloads = $this->_downloadRepository->findByUserId(4, $constraints);
-
-        echo '<pre>';
-        print_r($downloads);
-        echo '</pre>';
+        $quota = (($this->_quotaManager->getCurrentUserQuotaRemaining())/1000)/1000;
+        echo $quota;
     }
 }

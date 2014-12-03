@@ -13,4 +13,5 @@ interface IUser
     public function getYearsStepArtist();
     public function getFacebookId();
     public function setFacebookId($id);
+    public function getQuota();
 }

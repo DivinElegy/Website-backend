@@ -22,6 +22,9 @@ class AbstractPopulationHelper
             switch(get_class($mapsHelper))
             {
                 case 'DataAccess\DataMapper\Helpers\IntMapsHelper':
+                    if(!empty($row[$mapsHelper->getColumnName()]) && (string)(int)$row[$mapsHelper->getColumnName()] != $row[$mapsHelper->getColumnName()]) throw new Exception('Expected numeric value.');
+                    $constructors[$constructor] = (int)$row[$mapsHelper->getColumnName()];
+                    break;
                 case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
                     $constructors[$constructor] = $row[$mapsHelper->getColumnName()];
                     break;

@@ -13,7 +13,8 @@ interface IUserFactory
         $displayName,
         IName $name,
         array $tags,
-        $facebookId
+        $facebookId,
+        $quota
     );
 }
 
@@ -24,14 +25,16 @@ class UserFactory implements IUserFactory
         $displayName,
         IName $name,
         array $tags,
-        $facebookId
+        $facebookId,
+        $quota
     ) {
         return new User(
             $country,
             $displayName,
             $name,
             $tags,
-            $facebookId
+            $facebookId,
+            $quota
         );
     }
 }

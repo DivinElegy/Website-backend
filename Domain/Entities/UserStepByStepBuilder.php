@@ -32,6 +32,11 @@ interface IUserStepByStepBuilder_With_Tags
 
 interface IUserStepByStepBuilder_With_FacebookId
 {
+    public function With_Quota($quota);
+}
+
+interface IUserStepByStepBuilder_With_Quota
+{
     public function With_YearsStepArtist($years); //not going to make this mandatory as it is kind of a joke
     public function build();
 }
@@ -87,6 +92,15 @@ class UserStepByStepBuilder_With_Tags extends AbstractUserStepByStepBuilder impl
 }
 
 class UserStepByStepBuilder_With_FacebookId extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder_With_FacebookId
+{
+    public function With_Quota($quota)
+    {
+        $this->_userBuilder->With_Quota($quota);
+        return new UserStepByStepBuilder_With_Quota($this->_userBuilder);
+    }
+}
+
+class UserStepByStepBuilder_With_Quota extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder_With_Quota
 {
     public function With_YearsStepArtist($years) {
         $this->_userBuilder->With_YearsStepArtist($years);

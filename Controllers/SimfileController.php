@@ -13,7 +13,6 @@ use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
 use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IFile;
-use Domain\VOs\IFileMirror;
 
 class SimfileController implements IDivineController
 {
@@ -22,7 +21,6 @@ class SimfileController implements IDivineController
     private $_fileRepository;
     private $_response;
     private $_uploadManager;
-    private $_userSession;
     private $_zipParser;
     private $_smoMatcher;
     
@@ -41,7 +39,6 @@ class SimfileController implements IDivineController
         $this->_simfileRepository = $simfileRepository;
         $this->_packRepository = $packRepository;
         $this->_fileRepository = $fileRepository;
-        $this->_userSession = $userSession;
         $this->_zipParser = $zipParser;
         $this->_smoMatcher = $smoMatcher;
     }
@@ -73,6 +70,12 @@ class SimfileController implements IDivineController
             }
 
             $packMirrors = array();
+            
+            if($pack->getFile())
+            {
+                $packMirrors[] = array('source' => 'DivinElegy', 'uri' => 'files/pack/' . $pack->getFile()->getHash());
+            }
+            
             if($pack->getFile()->getMirrors())
             {
                 foreach($pack->getFile()->getMirrors() as $mirror)

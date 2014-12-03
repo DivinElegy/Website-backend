@@ -59,6 +59,9 @@ class HttpResponse implements IHttpResponse
                     $this->_statusCode);
                 
                 $statusCodeSent = true;
+            } else {
+                header(
+                    sprintf('%s:%s', $headerName, $headerValue));
             }
         }
         
@@ -89,5 +92,14 @@ class HttpResponse implements IHttpResponse
     {
         $this->sendHeaders()
              ->sendBody();
+    }
+    
+    public function download($path)
+    {
+        $fp = fopen($path, "rb");
+        $this->sendHeaders();
+        @ob_clean();
+        rewind($fp);
+        fpassthru($fp);
     }
 }

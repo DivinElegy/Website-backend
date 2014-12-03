@@ -56,7 +56,8 @@ return [
             'displayName' => DataAccess\Varchar('display_name'),
             'name' => DataAccess\VO('Name'),
             'tags' => DataAccess\VOArray('Tag', 'getTags'), // TODO: Make VarcharArray class
-            'facebookId' => DataAccess\Varchar('facebook_id')
+            'facebookId' => DataAccess\Varchar('facebook_id'),
+            'quota' => DataAccess\Int('quota')
         ]
     ],
     

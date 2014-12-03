@@ -40,5 +40,11 @@ return [
         'method' => ['GET'],
         'controller' => 'File',
         'action' => 'serveBanner'
+    ],
+    
+    '/files/pack/:hash' => [
+        'method' => ['GET'],
+        'controller' => 'File',
+        'action' => 'servePack'
     ]
 ];

@@ -16,6 +16,7 @@ class UserBuilder implements IUserBuilder
     private $_tags;
     private $_facebookId;
     private $_yearsStepArtist;
+    private $_quota;
     
     public function __construct(IUserFactory $userFactory)
     {
@@ -52,12 +53,18 @@ class UserBuilder implements IUserBuilder
         return $this;
     }
     
+    public function With_Quota($quota)
+    {
+        $this->_quota = $quota;
+    }
+    
     public function build() {
         return $this->_userFactory
                     ->createInstance($this->_country,
                                      $this->_displayName,
                                      $this->_name,
                                      $this->_tags,
-                                     $this->_facebookId);
+                                     $this->_facebookId,
+                                     $this->_quota);
     }
 }

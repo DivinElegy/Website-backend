@@ -23,6 +23,8 @@ return [
     'Domain\Entities\IFileFactory'                        => DI\object('Domain\Entities\FileFactory'),
     'Domain\Entities\IFileBuilder'                        => DI\object('Domain\Entities\FileBuilder'),
     'Domain\Entities\IFileStepByStepBuilder'              => DI\object('Domain\Entities\FileStepByStepBuilder'),
+    
+    'Domain\Entities\IDownloadFactory'                    => DI\object('Domain\Entities\DownloadFactory'),
 
     //services
     'Services\Http\IHttpResponse'                         => DI\object('Services\Http\HttpResponse'),
@@ -31,6 +33,7 @@ return [
                                                                 ->constructor(DI\link('router.maps')),
     'Services\Uploads\IUploadManager'                     => DI\object('Services\Uploads\UploadManager'),
     'Services\IUserSession'                               => DI\object('Services\UserSession'),
+    'Services\IUserQuota'                                 => DI\object('Services\UserQuota'),
     'Services\Uploads\IFileFactory'                       => DI\object('Services\Uploads\FileFactory'),
     'Services\IFacebookSessionFactory'                    => DI\object('Services\FacebookSessionFactory')
                                                                 ->constructor(DI\link('facebook.app')),
