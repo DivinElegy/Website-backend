@@ -57,23 +57,12 @@ class DataMapper implements IDataMapper
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
         $mergeMap = array();
         $flattened = array();
-
+        
         foreach($queries as $index => $query)
         {
             $this_table = $query['table'];
             $this_columns = $query['columns'];
-            
-            if(!array_key_exists($index, $mergeMap)) {
-                $prepared = isset($query['prepared']) ? $query['prepared'] : null;
-                $id = isset($query['id']) ? $query['id'] : null;
 
-                $flattened[] = array(
-                    'columns' => $this_columns,
-                    'table' => $this_table,
-                    'prepared' => $prepared,
-                    'id' => $id
-                );
-            }
             
             for($i = $index+1; $i<count($queries); $i++)
             {
@@ -93,7 +82,45 @@ class DataMapper implements IDataMapper
                         //need to keep track of what we merged as future queries might reference the old ids.
                         $mergeMap[$i] = $index;
                     }
+                    
+                    //XXX: Another thing that might happen is we have to create queries running on the same table, but with unique columns.
+                    //In this case, we can take the columns of one and put it into the other. Otherwise we create two records when we really
+                    //should have only one. An example of this is when a user is created, a query to add the country to users_meta is run,
+                    //and then _another_ to add firstname, lastname and user_id. It should really all be done in one query.
+                    
+                    //Make sure both queries are for the same table, and the both relate back to the main query
+                    if($this_table == $queries[$i]['table'] && in_array('%MAIN_QUERY_ID%', $this_columns) && in_array('%MAIN_QUERY_ID%', $queries[$i]['columns']))
+                    {
+                        $this_column_names = array_keys($this_columns);
+                        $other_column_names = array_keys($queries[$i]['columns']);
+                        $combine = true;
+                        foreach($this_column_names as $column_name)
+                        {
+                            if($this_columns[$column_name] != '%MAIN_QUERY_ID%' && in_array($column_name, $other_column_names))
+                            {
+                                $combine = false;
+                            }
+                        }
+                        
+                        if($combine)
+                        {
+                            $this_columns = array_merge($this_columns, $queries[$i]['columns']);
+                            $mergeMap[$i] = $index;
+                        }
+                    }
                 }
+            }
+
+            if(!array_key_exists($index, $mergeMap)) {
+                $prepared = isset($query['prepared']) ? $query['prepared'] : null;
+                $id = isset($query['id']) ? $query['id'] : null;
+
+                $flattened[] = array(
+                    'columns' => $this_columns,
+                    'table' => $this_table,
+                    'prepared' => $prepared,
+                    'id' => $id
+                );
             }
         }
         
@@ -115,7 +142,7 @@ class DataMapper implements IDataMapper
             
             $queries[] = $query;
         }
-                        
+
        // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)
        // {
             $idMap = [];
