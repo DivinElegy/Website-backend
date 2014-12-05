@@ -13,6 +13,7 @@ use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
 use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IFile;
+use Domain\Util;
 
 class SimfileController implements IDivineController
 {
@@ -89,7 +90,8 @@ class SimfileController implements IDivineController
                 'contributors' => $pack->getContributors(),
                 'simfiles' => $packSimfiles,
                 'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
-                'mirrors' => $packMirrors
+                'mirrors' => $packMirrors,
+                'size' => $pack->getFile() ? Util::bytesToHumanReadable($pack->getFile()->getSize()) : null
             );
         }
         
@@ -181,7 +183,8 @@ class SimfileController implements IDivineController
             'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
             'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
             'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default',
-            'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null
+            'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null,
+            'size' => $simfile->getSimfile() ? Util::bytesToHumanReadable($simfile->getSimfile()->getSize()) : null
         );
     }
 }
