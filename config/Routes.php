@@ -45,6 +45,12 @@ return [
     '/files/pack/:hash' => [
         'method' => ['GET'],
         'controller' => 'File',
-        'action' => 'servePack'
+        'action' => 'serveSimfileOrPack'
+    ],
+    
+    '/files/simfile/:hash' => [
+        'method' => ['GET'],
+        'controller' => 'File',
+        'action' => 'serveSimfileOrPack'
     ]
 ];

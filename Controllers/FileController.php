@@ -68,7 +68,7 @@ class FileController implements IDivineController
         exit();
     }
     
-    public function servePackAction($hash)
+    public function serveSimfileOrPackAction($hash)
     {
         $file = $this->_fileRepository->findByHash($hash);
         $quotaRemaining = $this->_userQuota->getCurrentUserQuotaRemaining();
@@ -94,7 +94,7 @@ class FileController implements IDivineController
                         ->setBody(file_get_contents($zip))
                         ->sendResponse();
     }
-    
+        
     private function notFound()
     {
         $this->_response->setHeader('HTTP/1.0 404 Not Found', 'Nothing to see here')
