@@ -7,10 +7,22 @@ return [
         'action' => 'list'
     ],
     
-    //TODO: test controller, delete later
-    '/downloadtest' => [
+    '/simfiles/latest/simfile' => [
         'methods' => ['GET'],
-        'controller' => 'downloadTest'
+        'controller' => 'Simfile',
+        'action' => 'latestSimfile'
+    ],
+    
+    '/simfiles/latest/pack' => [
+        'methods' => ['GET'],
+        'controller' => 'Simfile',
+        'action' => 'latestPack'
+    ],
+    
+    '/simfiles/popular' => [
+        'methods' => ['GET'],
+        'controller' => 'Simfile',
+        'action' => 'popular'
     ],
     
     '/simfiles/upload' => [

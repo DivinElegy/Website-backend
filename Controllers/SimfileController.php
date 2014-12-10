@@ -11,8 +11,10 @@ use Services\ISMOMatcher;
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
+use DataAccess\IDownloadRepository;
 use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IFile;
+use Domain\Entities\StepMania\IPack;
 use Domain\Util;
 
 class SimfileController implements IDivineController
@@ -24,6 +26,7 @@ class SimfileController implements IDivineController
     private $_uploadManager;
     private $_zipParser;
     private $_smoMatcher;
+    private $_downloadRepository;
     
     public function __construct(
         IHttpResponse $response,
@@ -33,7 +36,8 @@ class SimfileController implements IDivineController
         IFileRepository $fileRepository,
         IUserSession $userSession,
         IZipParser $zipParser,
-        ISMOMatcher $smoMatcher
+        ISMOMatcher $smoMatcher,
+        IDownloadRepository $downloadRepository
     ) {
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
@@ -42,6 +46,7 @@ class SimfileController implements IDivineController
         $this->_fileRepository = $fileRepository;
         $this->_zipParser = $zipParser;
         $this->_smoMatcher = $smoMatcher;
+        $this->_downloadRepository = $downloadRepository;
     }
     
     public function indexAction() {
@@ -64,34 +69,14 @@ class SimfileController implements IDivineController
         
         foreach($packs as $pack)
         {
-            $packSimfiles = array();
-            foreach($pack->getSimfiles() as $simfile)
-            {
-                $packSimfiles[] = $this->simfileToArray($simfile);
-            }
-
-            $packMirrors = array();
-            
-            if($pack->getFile())
-            {
-                $packMirrors[] = array('source' => 'DivinElegy', 'uri' => 'files/pack/' . $pack->getFile()->getHash());
-            }
-            
-            if($pack->getFile()->getMirrors())
-            {
-                foreach($pack->getFile()->getMirrors() as $mirror)
-                {
-                    $packMirrors[] = array('source' => $mirror->getSource(), 'uri' => $mirror->getUri());
-                }
-            }
-            
             $packArray[] = array(
                 'title'=> $pack->getTitle(),
                 'contributors' => $pack->getContributors(),
-                'simfiles' => $packSimfiles,
+                'simfiles' => $this->getPackSimfilesArray($pack),
                 'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
-                'mirrors' => $packMirrors,
-                'size' => $pack->getFile() ? Util::bytesToHumanReadable($pack->getFile()->getSize()) : null
+                'mirrors' => $this->getPackMirrorsArray($pack),
+                'size' => $pack->getFile() ? Util::bytesToHumanReadable($pack->getFile()->getSize()) : null,
+                'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null
             );
         }
         
@@ -100,6 +85,65 @@ class SimfileController implements IDivineController
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody(json_encode($returnArray))
                         ->sendResponse();
+    }
+    
+    public function latestSimfileAction()
+    {
+        $simfile = $this->_simfileRepository->findRange(0, -1);
+        $this->_response->setHeader('Content-Type', 'application/json')
+                        ->setBody(json_encode($this->simfileToArray(reset($simfile))))
+                        ->sendResponse();
+    }
+    
+    public function latestPackAction()
+    {
+        $pack = $this->_packRepository->findRange(0, -1);
+        $pack = reset($pack);
+        
+        $packArray = array(
+            'title'=> $pack->getTitle(),
+            'contributors' => $pack->getContributors(),
+            'simfiles' => $this->getPackSimfilesArray($pack),
+            'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
+            'mirrors' => $this->getPackMirrorsArray($pack),
+            'size' => $pack->getFile() ? Util::bytesToHumanReadable($pack->getFile()->getSize()) : null,
+            'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null
+        );
+        
+        $this->_response->setHeader('Content-Type', 'application/json')
+                        ->setBody(json_encode($packArray))
+                        ->sendResponse();
+    }
+    
+    public function popularAction()
+    {
+        $returnArray = array();
+        $popularDownloads = $this->_downloadRepository->findPopular();
+        $popularDownloads = reset($popularDownloads);
+        $packOrFileId = $popularDownloads->getFile()->getId();
+        
+        $simfile = $this->_simfileRepository->findByFileId($packOrFileId);
+        if($simfile)
+        {
+            $returnArray = $this->simfileToArray(reset($simfile));
+        } else {
+            $pack = $this->_packRepository->findByFileId($packOrFileId);
+            $pack = reset($pack);
+            $returnArray = array(
+                'title'=> $pack->getTitle(),
+                'contributors' => $pack->getContributors(),
+                'simfiles' => $this->getPackSimfilesArray($pack),
+                'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
+                'mirrors' => $this->getPackMirrorsArray($pack),
+                'size' => $pack->getFile() ? Util::bytesToHumanReadable($pack->getFile()->getSize()) : null,
+                'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null
+            );
+        }
+        
+        $this->_response->setHeader('Content-Type', 'application/json')
+                        ->setBody(json_encode($returnArray))
+                        ->sendResponse();
+        
     }
     
     public function uploadAction()
@@ -137,6 +181,37 @@ class SimfileController implements IDivineController
                 $this->_simfileRepository->save($simfile);
             }
         }
+    }
+    
+    private function getPackMirrorsArray(IPack $pack)
+    {
+        $packMirrors = array();
+
+        if($pack->getFile())
+        {
+            $packMirrors[] = array('source' => 'DivinElegy', 'uri' => 'files/pack/' . $pack->getFile()->getHash());
+        }
+
+        if($pack->getFile()->getMirrors())
+        {
+            foreach($pack->getFile()->getMirrors() as $mirror)
+            {
+                $packMirrors[] = array('source' => $mirror->getSource(), 'uri' => $mirror->getUri());
+            }
+        }
+        
+        return $packMirrors;
+    }
+    
+    private function getPackSimfilesArray(IPack $pack)
+    {
+        $packSimfiles = array();
+        foreach($pack->getSimfiles() as $simfile)
+        {
+            $packSimfiles[] = $this->simfileToArray($simfile);
+        }
+        
+        return $packSimfiles;
     }
     
     private function findAndAddSmoMirror(IFile $file)
@@ -184,7 +259,8 @@ class SimfileController implements IDivineController
             'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
             'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default',
             'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null,
-            'size' => $simfile->getSimfile() ? Util::bytesToHumanReadable($simfile->getSimfile()->getSize()) : null
+            'size' => $simfile->getSimfile() ? Util::bytesToHumanReadable($simfile->getSimfile()->getSize()) : null,
+            'uploaded' => $simfile->getSimfile() ? date('F jS, Y', $simfile->getSimfile()->getUploadDate()) : null
         );
     }
 }

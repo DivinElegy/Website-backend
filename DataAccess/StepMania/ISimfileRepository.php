@@ -8,6 +8,7 @@ use Domain\Entities\StepMania\ISimfile;
 
 interface ISimfileRepository extends IRepository
 {
+    public function findByFileId($id);
     public function findByTitle($title, ISimfileQueryConstraints $constraints);
     public function findByArtist($artist, ISimfileQueryConstraints $constraints);
     public function findByBpm($high, $low, ISimfileQueryConstraints $constraints);

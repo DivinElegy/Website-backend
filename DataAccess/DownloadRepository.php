@@ -64,6 +64,17 @@ class DownloadRepository implements IDownloadRepository
         return $this->applyConstraintsAndReturn($constraints, $queryBuilder);
     }
     
+    public function findPopular()
+    {
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->count('file_id', 'hits')
+                     ->group('file_id')
+                     ->orderBy('hits', 'DESC')
+                     ->limit(10);
+        
+        return $this->_dataMapper->map('Download', $queryBuilder);
+    }
+    
     private function applyConstraintsAndReturn(IDownloadQueryConstraints $constraints = NULL, IQueryBuilder $queryBuilder)
     {
         if($constraints)

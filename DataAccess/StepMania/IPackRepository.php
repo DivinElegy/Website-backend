@@ -7,6 +7,7 @@ use Domain\Entities\StepMania\IPack;
 
 interface IPackRepository extends IRepository
 {
+    public function findByFileId($id);
     public function findByTitle($title);
     public function findByContributor($contributor);
     public function save(IPack $entity);

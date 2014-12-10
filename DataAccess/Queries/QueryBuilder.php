@@ -11,13 +11,19 @@ class QueryBuilder implements IQueryBuilder
     protected $_whereClauses = array();
     protected $_limitClause;
     protected $_joinClauses = array();
+    protected $_orderClause;
+    protected $_countClause;
+    protected $_groupClause;
     
     public function buildQuery()
     {        
         $this->applyJoinClauses()
              ->applyWhereClauses()
-             ->applyLimitClause();
-
+             ->applyGroupClause()
+             ->applyOrderClause()
+             ->applyLimitClause()
+             ->applyCountClause();
+        
         return $this->_queryString;
     }
     
@@ -56,6 +62,40 @@ class QueryBuilder implements IQueryBuilder
         return $this->where($columnName, 'is', null);
     }
     
+    public function count($column, $as = null)
+    {
+        if($as)
+        {
+            $this->_countClause = sprintf(', count(%s) as %s', $column, $as);
+        } else {
+            $this->_countClause = sprintf(', count(%s)', $column);
+        }
+        
+        return $this;
+    }
+    
+    public function group($column)
+    {
+        $this->_groupClause = sprintf(' group by %s', $column);
+        
+        return $this;
+    }
+    
+    private function applyCountClause()
+    {
+        $pos = strpos($this->_queryString, '*')+1;
+        $this->_queryString = substr_replace($this->_queryString, $this->_countClause, $pos, 0);
+        
+        return $this;
+    }
+    
+    private function applyGroupClause()
+    {
+        $this->_queryString .= $this->_groupClause;
+        
+        return $this;
+    }
+    
     private function applyJoinClauses()
     {
         foreach($this->_joinClauses as $joinClause)
@@ -66,8 +106,17 @@ class QueryBuilder implements IQueryBuilder
         return $this;
     }
     
+    public function orderBy($column, $direction) 
+    {
+        $this->_orderClause = sprintf(' ORDER BY %s %s', $column, $direction);
+        
+        return $this;
+    }
+    
     private function applyWhereClauses()
     {
+        if(!$this->_whereClauses) return $this;
+        
         $this->_queryString .= ' WHERE ';
         
         foreach($this->_whereClauses as $whereClause)
@@ -94,6 +143,12 @@ class QueryBuilder implements IQueryBuilder
     private function applyLimitClause()
     {
         $this->_queryString .= $this->_limitClause;
+        return $this;
+    }
+    
+    private function applyOrderClause()
+    {
+        $this->_queryString .= $this->_orderClause;
         return $this;
     }
     

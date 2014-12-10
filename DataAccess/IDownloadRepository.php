@@ -10,6 +10,7 @@ interface IDownloadRepository extends IRepository
 {
     public function findByUserId($id, IDownloadQueryConstraints $constraints = null);
     public function findByFileId($id, IDownloadQueryConstraints $constraints = null);
+    public function findPopular();
     public function save(IDownload $file);
 }
 

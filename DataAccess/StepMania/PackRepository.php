@@ -35,11 +35,19 @@ class PackRepository implements IPackRepository
         return $result;
     }
     
+    public function findByFileId($id)
+    {
+        $queryBuilder = $this->_queryBuilderFactory->createInstance();
+        $queryBuilder->where('file_id', '=', $id);
+        return $this->_dataMapper->map('Pack', $queryBuilder);
+    }
+    
     public function findRange($id, $limit)
     {
         $queryBuilder = $this->_queryBuilderFactory->createInstance();
-        $queryBuilder->where('id', '>=', $id)->limit($limit);
-                
+        $queryBuilder->where('id', '>=', $id)->limit(abs($limit));
+        if($limit < 0) $queryBuilder->orderBy('id', 'DESC');
+        
         return $this->_dataMapper->map('Pack', $queryBuilder);
     }
     
