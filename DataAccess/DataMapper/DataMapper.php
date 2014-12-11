@@ -57,7 +57,7 @@ class DataMapper implements IDataMapper
         $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
         $mergeMap = array();
         $flattened = array();
-        
+
         foreach($queries as $index => $query)
         {
             $this_table = $query['table'];
@@ -110,12 +110,12 @@ class DataMapper implements IDataMapper
                     }
                 }
             }
-
+            
             if(!array_key_exists($index, $mergeMap)) {
                 $prepared = isset($query['prepared']) ? $query['prepared'] : null;
                 $id = isset($query['id']) ? $query['id'] : null;
 
-                $flattened[] = array(
+                $flattened[$index] = array(
                     'columns' => $this_columns,
                     'table' => $this_table,
                     'prepared' => $prepared,
@@ -126,7 +126,7 @@ class DataMapper implements IDataMapper
         
         $queries = array();
                 
-        foreach($flattened as $info)
+        foreach($flattened as $index => $info)
         {
             if(isset($info['id']))
             {
@@ -140,7 +140,7 @@ class DataMapper implements IDataMapper
                 implode(', ', $info['columns']));
             }
             
-            $queries[] = $query;
+            $queries[$index] = $query;
         }
 
        // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)

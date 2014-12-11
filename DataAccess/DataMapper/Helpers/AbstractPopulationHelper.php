@@ -112,7 +112,7 @@ class AbstractPopulationHelper
                                         );
                                     } else {
                                         //TODO: logic to detemine what the value is? i.e., string, int etc?
-                                        $queryColumnNamesAndValues[$columnName] = sprintf('"%s"', $columnValue);
+                                        $queryColumnNamesAndValues[$columnName] = $db->quote($columnValue);
                                     }
                                 }
 
@@ -198,7 +198,7 @@ class AbstractPopulationHelper
                             {
                                 $property = ($property) ? '1' : '0';
                             }
-                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('%u', $property);
+                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = $property;
                         }
                         break;
                     case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
@@ -208,7 +208,7 @@ class AbstractPopulationHelper
                                 $mapsHelper->getColumnName(),
                                 $property);                        
                         } else {
-                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = sprintf('"%s"', $property);
+                            $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = $db->quote($property);
                         }
 
                         break;
@@ -371,7 +371,7 @@ class AbstractPopulationHelper
         
         foreach($columns as $columnName => $columnValue)
         {
-            $query .= sprintf('%s="%s" AND ', $columnName, $columnValue);
+            $query .= sprintf('%s="%s" AND ', $columnName, str_replace('"', '\"', $columnValue));
         }
         
         $query = substr($query, 0, -4);
