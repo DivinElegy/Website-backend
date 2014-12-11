@@ -6,6 +6,7 @@ use Controllers\IDivineController;
 use Services\Http\IHttpRequest;
 use Services\Http\IHttpResponse;
 use Services\IUserSession;
+use Services\IStatusReporter;
 use Services\IUserQuota;
 use Domain\Entities\IDownloadFactory;
 use DataAccess\IFileRepository;
@@ -20,6 +21,7 @@ class FileController implements IDivineController
     private $_downloadFactory;
     private $_userSession;
     private $_userQuota;
+    private $_statusReporter;
     
     public function __construct(
         IHttpRequest $request,
@@ -28,7 +30,8 @@ class FileController implements IDivineController
         IDownloadFactory $downloadFactory,
         IDownloadRepository $downloadRepository,
         IUserSession $userSession,
-        IUserQuota $userQuota
+        IUserQuota $userQuota,
+        IStatusReporter $statusReporter
     ) {
         $this->_request = $request;
         $this->_response = $response;
@@ -37,6 +40,7 @@ class FileController implements IDivineController
         $this->_downloadFactory = $downloadFactory;
         $this->_userSession = $userSession;
         $this->_userQuota = $userQuota;
+        $this->_statusReporter = $statusReporter;
     }
     
     public function indexAction() {
@@ -106,16 +110,16 @@ class FileController implements IDivineController
     private function notAuthorised()
     {
         $this->_response->setHeader('Content-Type', 'application/json')
-            ->setBody(json_encode(array('error' => 'You must be authenticated to download files')))
-            ->sendResponse();
+                        ->setBody($this->_statusReporter->error('You must be authenticated to download files')->json())
+                        ->sendResponse();
         exit();
     }
     
     private function notEnoughQuota()
     {
         $this->_response->setHeader('Content-Type', 'application/json')
-            ->setBody(json_encode(array('error' => 'You don\'t have enough quota remaining for this file.')))
-            ->sendResponse();
+                        ->setBody($this->_statusReporter->error('You don\'t have enough quota remaining for this file.')->json())
+                        ->sendResponse();
         exit();
     }
 }

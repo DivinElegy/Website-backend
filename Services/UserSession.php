@@ -27,17 +27,19 @@ class UserSession implements IUserSession
 
     private function findToken()
     {        
-        if($this->_request->isPost())
-        {
+        //if($this->_request->isPost())
+        //{
+        //Try post
             $request = $this->_request->post();
             if(!empty($request['token'])) return $request['token'];
-        }
+        //}
         
-        if($this->_request->isGet())
-        {
+        //if($this->_request->isGet())
+        //{
+        //Try get
             $request = $this->_request->get();
             if(!empty($request['token'])) return $request['token'];
-        }
+        //}
         
         //no good, try the body
         $body = json_decode($this->_request->getBody(), true);

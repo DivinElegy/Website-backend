@@ -2,12 +2,14 @@
 
 namespace Controllers;
 
+use Exception;
 use Controllers\IDivineController;
 use Services\Http\IHttpResponse;
 use Services\Uploads\IUploadManager;
 use Services\IUserSession;
 use Services\IZipParser;
 use Services\ISMOMatcher;
+use Services\IStatusReporter;
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
@@ -27,6 +29,8 @@ class SimfileController implements IDivineController
     private $_zipParser;
     private $_smoMatcher;
     private $_downloadRepository;
+    private $_statusReporter;
+    private $_userSession;
     
     public function __construct(
         IHttpResponse $response,
@@ -37,7 +41,8 @@ class SimfileController implements IDivineController
         IUserSession $userSession,
         IZipParser $zipParser,
         ISMOMatcher $smoMatcher,
-        IDownloadRepository $downloadRepository
+        IDownloadRepository $downloadRepository,
+        IStatusReporter $statusReporter
     ) {
         $this->_response = $response;
         $this->_uploadManager = $uploadManager;
@@ -47,6 +52,8 @@ class SimfileController implements IDivineController
         $this->_zipParser = $zipParser;
         $this->_smoMatcher = $smoMatcher;
         $this->_downloadRepository = $downloadRepository;
+        $this->_statusReporter = $statusReporter;
+        $this->_userSession = $userSession;
     }
     
     public function indexAction() {
@@ -147,7 +154,9 @@ class SimfileController implements IDivineController
     }
     
     public function uploadAction()
-    {                       
+    {
+        if(!$this->_userSession->getCurrentUser()) $this->_statusReporter->error('You must be authenticated to upload files');
+        
         //TODO: Put directory in config ?
         $files = $this->_uploadManager->setFilesDirectory('../files')
                                       ->setDestination('StepMania/')
@@ -157,7 +166,9 @@ class SimfileController implements IDivineController
         {
             $zipParser = $this->_zipParser;
             $zipParser->parse($file);
-                        
+                   
+            if(!$zipParser->simfiles()) $this->_statusReporter->error('That zip doesn\'t seem to have any simfiles in it.');
+            
             //save the actual zip in the db
             $this->findAndAddSmoMirror($file);
             $this->_fileRepository->save($file);  
@@ -181,6 +192,8 @@ class SimfileController implements IDivineController
                 $this->_simfileRepository->save($simfile);
             }
         }
+        
+        $this->_statusReporter->success('Uploaded succesfully');
     }
     
     private function getPackMirrorsArray(IPack $pack)

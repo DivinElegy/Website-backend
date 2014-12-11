@@ -1,0 +1,6 @@
+<?php
+
+return [
+    'allow-origin' => 'http://roll.divinelegy.meeples:8000',
+    'mode'         => 'production'
+];

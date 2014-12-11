@@ -1,11 +1,14 @@
 <?php
 
-//TODO: Config this
-header("Access-Control-Allow-Origin: http://172.17.12.110:8000");
-header("Access-Control-Allow-Origin: http://roll.divinelegy.meeples:8000");
-//header("Access-Control-Allow-Origin: http://roll.divinelegy.dev:8000");
-
 require_once('../vendor/autoload.php');
+
+$config = require('../config/app.php');
+
+// Allow these origins to do cross domain JS.
+header("Access-Control-Allow-Origin: " . $config['allow-origin']);
+
+// Nice exceptions
+if($config['mode'] == 'production') set_exception_handler(array('\Services\StatusReporter', 'exception'));
 
 // Everything time related should be UTC+0 based
 date_default_timezone_set('UTC');

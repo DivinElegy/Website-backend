@@ -92,12 +92,12 @@ class UploadManager implements IUploadManager{
             
             /* @var $file \Services\Uploads\IFile */
             $results[] = $this->_fileBuilder->With_Hash($hash)
-                                       ->With_Path(rtrim($this->_destination, '/'))
-                                       ->With_Filename($file->getName())
-                                       ->With_Mimetype($file->getType())
-                                       ->With_Size($file->getSize())
-                                       ->With_UploadDate(time())
-                                       ->build();
+                                            ->With_Path(rtrim($this->_destination, '/'))
+                                            ->With_Filename($file->getName())
+                                            ->With_Mimetype($file->getType())
+                                            ->With_Size($file->getSize())
+                                            ->With_UploadDate(time())
+                                            ->build();
         }
         
         return $results;
