@@ -53,9 +53,10 @@ class FileController implements IDivineController
         $file = $this->_fileRepository->findByHash($hash);
         if($hash == 'default') $this->serveDefaultBanner();
         if(!$file) $this->notFound();
-                
-        $match = reset(glob('../files/' . $file->getPath() . '/' . $file->getHash() . '.*'));
-        
+
+        $matches = glob(realpath('../files/' . $file->getPath()) . '/' . $file->getHash() . '.*');
+        $match = reset($matches);
+
         $this->_response->setHeader('Content-Type', $file->getMimetype())
                         ->setHeader('Content-Length', $file->getSize())
                         ->setBody(file_get_contents($match))

@@ -8,6 +8,6 @@ interface IStatusReporter
 {
     public function success($message);
     public function error($message);
-    public function exception(Exception $exception);
+    public static function exception(Exception $exception);
     public function json();
 }

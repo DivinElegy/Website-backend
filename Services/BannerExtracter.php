@@ -65,7 +65,7 @@ class BannerExtracter implements IBannerExtracter
         for($i=0; $i<$za->numFiles; $i++)
         {
             $stat = $za->statIndex($i);
-            $type = @exif_imagetype('zip://' . $zipfile . '#' . $stat['name']);
+            $type = @exif_imagetype('zip://' . realpath($zipfile) . '#' . $stat['name']);
 
             if($type !== false)
             {
@@ -77,7 +77,7 @@ class BannerExtracter implements IBannerExtracter
                     $this->_hash = $this->randomFilename($stat['name']);
                     $this->_destinationFileName = $this->_hash . '.' . pathinfo($stat['name'], PATHINFO_EXTENSION);
                     $bannerName = $pathComponents[1];
-                    $result = copy('zip://' . $zipfile . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);
+                    $result = copy('zip://' . realpath($zipfile) . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);
                     break;
                 }
             }

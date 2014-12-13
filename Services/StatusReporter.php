@@ -41,7 +41,7 @@ class StatusReporter implements IStatusReporter
     }
     
     //no need to exit here, exceptions stop the program.
-    public function exception(Exception $exception)
+    public static function exception(Exception $exception)
     {       
         //we'll be instatic context here so I have to do it this way.
         header('Content-Type: application/json');

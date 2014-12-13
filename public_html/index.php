@@ -8,7 +8,11 @@ $config = require('../config/app.php');
 header("Access-Control-Allow-Origin: " . $config['allow-origin']);
 
 // Nice exceptions
-if($config['mode'] == 'production') set_exception_handler(array('\Services\StatusReporter', 'exception'));
+if($config['mode'] == 'production')
+{
+    ini_set('display_errors', 0);
+    set_exception_handler(array('\Services\StatusReporter', 'exception'));
+}
 
 // Everything time related should be UTC+0 based
 date_default_timezone_set('UTC');

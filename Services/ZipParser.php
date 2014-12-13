@@ -89,7 +89,8 @@ class ZipParser implements IZipParser
             $stat = $this->_za->statIndex($i);
             if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
             {
-                $smData = file_get_contents('zip://../files/StepMania/' . $this->_file->getHash() . '.zip#' . $stat['name']);
+                $path = realpath('../files/StepMania/' . $this->_file->getHash() . '.zip');
+                $smData = file_get_contents('zip://' . $path . '#' . $stat['name']);
                 $this->_smFiles[$stat['name']] = $smData;
             }
         }
