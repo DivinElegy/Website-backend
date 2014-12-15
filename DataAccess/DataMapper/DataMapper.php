@@ -7,6 +7,7 @@ use DataAccess\IDatabaseFactory;
 use DataAccess\DataMapper\IDataMapper;
 use DataAccess\Queries\IQueryBuilder;
 use DataAccess\DataMapper\Helpers\AbstractPopulationHelper;
+use DataAccess\DataMapper\LazyLoadedEntities;
 use ReflectionClass;
 
 class DataMapper implements IDataMapper
@@ -31,6 +32,12 @@ class DataMapper implements IDataMapper
         $rows = $statement->fetchAll();
         
         $entities = array();
+
+        if(count($rows) > 2)
+        {
+            //TODO: Factory?
+            return new LazyLoadedEntities($rows, $entityName, $this->_maps, $this->_db);
+        }
         
         foreach($rows as $row)
         {
@@ -48,7 +55,7 @@ class DataMapper implements IDataMapper
             $class->setId($row['id']);
             $entities[$row['id']] = $class;
         }
-        
+                
         return $entities;
     }
         
