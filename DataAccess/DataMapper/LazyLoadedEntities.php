@@ -15,13 +15,15 @@ class LazyLoadedEntities implements Iterator
     private $_loadedEntitiesIndex = 0;
     private $_loadedEntities = array();
     private $_db;
+    private $_num;
     
-    public function __construct(array $rows, $entityName, $maps, $db)
+    public function __construct(array $rows, $entityName, $maps, $db, $numToLoad)
     {
         $this->_rows = $rows;
         $this->_entityName = $entityName;
         $this->_maps = $maps;
         $this->_db = $db;
+        $this->_num = $numToLoad;
     }
     
     public function current()
@@ -67,7 +69,7 @@ class LazyLoadedEntities implements Iterator
     //unsets the current entities array, and maps in the next 10
     private function mapEntities()
     {
-        $numToMap = 50;
+        $numToMap = $this->_num;
         $tick = 0;
         
         unset($this->_loadedEentities);

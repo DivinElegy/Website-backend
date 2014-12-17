@@ -6,6 +6,7 @@ return [
     'router.maps' => '../config/Routes.php',
     'db.credentials' => '../config/db.php',
     'facebook.app' => '../config/FacebookApp.php',
+    'app.config' => '../config/app.php',
     
     //entites
     'Domain\Entities\StepMania\ISimfileFactory'           => DI\object('Domain\Entities\StepMania\SimfileFactory'),
@@ -42,6 +43,8 @@ return [
     'Services\IBannerExtracter'                           => DI\object('Services\BannerExtracter'),
     'Services\ISMOMatcher'                                => DI\object('Services\SMOMatcher'),
     'Services\IStatusReporter'                            => DI\object('Services\StatusReporter'),
+    'Services\IConfigManager'                             => DI\object('Services\ConfigManager')
+                                                                ->constructor(DI\link(('app.config'))),
     
     //DA
     'DataAccess\StepMania\ISimfileRepository'             => DI\object('DataAccess\StepMania\SimfileRepository'),

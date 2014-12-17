@@ -30,7 +30,12 @@ return [
         'controller' => 'Simfile',
         'action' => 'upload'
     ],
-            
+    
+    '/cache/update' => [
+        'methods' => ['GET'],
+        'controller' => 'SimfileCache',
+    ],
+    
     '/simfiles/argTest/:testarg' => [
         'methods' => ['GET'],
         'controller' => 'Simfile',

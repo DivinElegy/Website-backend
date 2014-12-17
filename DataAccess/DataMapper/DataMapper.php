@@ -8,17 +8,20 @@ use DataAccess\DataMapper\IDataMapper;
 use DataAccess\Queries\IQueryBuilder;
 use DataAccess\DataMapper\Helpers\AbstractPopulationHelper;
 use DataAccess\DataMapper\LazyLoadedEntities;
+use Services\IConfigManager;
 use ReflectionClass;
 
 class DataMapper implements IDataMapper
 {
     private $_db;
     private $_maps;
+    private $_configManager;
     
-    public function __construct($maps, IDatabaseFactory $databaseFactory)
+    public function __construct($maps, IDatabaseFactory $databaseFactory, IConfigManager $configManager)
     {
         $this->_db = $databaseFactory->createInstance();        
         $this->_maps = include $maps;
+        $this->_configManager = $configManager;
     }
     
     public function map($entityName, IQueryBuilder $queryBuilder)
@@ -33,10 +36,10 @@ class DataMapper implements IDataMapper
         
         $entities = array();
 
-        if(count($rows) > 2)
+        if(count($rows) > $this->_configManager->getDirective('maxEntitiesToLoad'))
         {
             //TODO: Factory?
-            return new LazyLoadedEntities($rows, $entityName, $this->_maps, $this->_db);
+            return new LazyLoadedEntities($rows, $entityName, $this->_maps, $this->_db, $this->_configManager->getDirective('maxEntitiesToLoad'));
         }
         
         foreach($rows as $row)

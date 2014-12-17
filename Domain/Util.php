@@ -2,6 +2,9 @@
 
 namespace Domain;
 
+use Domain\Entities\StepMania\ISimfile;
+use Domain\Entities\StepMania\IPack;
+
 class Util
 {
     private static $_countryCodes =
@@ -283,5 +286,87 @@ class Util
         $factor = floor((strlen($bytes) - 1) / 3);
 
         return sprintf("%.{$dec}f", $bytes / pow(1000, $factor)) . @$size[$factor];
+    }
+
+    public static function packToArray(IPack $pack)
+    {
+        return array(
+            'title'=> $pack->getTitle(),
+            'contributors' => $pack->getContributors(),
+            'simfiles' => self::getPackSimfilesArray($pack),
+            'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
+            'mirrors' => self::getPackMirrorsArray($pack),
+            'size' => $pack->getFile() ? self::bytesToHumanReadable($pack->getFile()->getSize()) : null,
+            'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null
+        );
+    }
+    
+    public static function getPackMirrorsArray(IPack $pack)
+    {
+        $packMirrors = array();
+
+        if($pack->getFile())
+        {
+            $packMirrors[] = array('source' => 'DivinElegy', 'uri' => 'files/pack/' . $pack->getFile()->getHash());
+        }
+
+        if($pack->getFile()->getMirrors())
+        {
+            foreach($pack->getFile()->getMirrors() as $mirror)
+            {
+                $packMirrors[] = array('source' => $mirror->getSource(), 'uri' => $mirror->getUri());
+            }
+        }
+        
+        return $packMirrors;
+    }
+    
+    public static function getPackSimfilesArray(IPack $pack)
+    {
+        $packSimfiles = array();
+        foreach($pack->getSimfiles() as $simfile)
+        {
+            $packSimfiles[] = self::simfileToArray($simfile);
+        }
+        
+        return $packSimfiles;
+    }
+    
+    public static function simfileToArray(Entities\StepMania\ISimfile $simfile)
+    {
+        $singleSteps = array();
+        $doubleSteps = array();
+
+        foreach($simfile->getSteps() as $steps)
+        {   
+            $stepDetails = array(
+                'artist' => $steps->getArtist()->getTag(),
+                'difficulty' => $steps->getDifficulty()->getITGName(),
+                'rating' => $steps->getRating()
+            );
+
+            if($steps->getMode()->getPrettyName() == 'Single')
+            {
+                $singleSteps[] = $stepDetails;
+            } else {
+                $doubleSteps[] = $stepDetails;
+            }
+        }
+
+        return array(            
+            'title' => $simfile->getTitle(),
+            'artist' => $simfile->getArtist()->getName(),
+            'steps' => array(
+                'single' => $singleSteps,
+                'double' => $doubleSteps
+            ),
+            'bgChanges' => $simfile->hasBgChanges() ? 'Yes' : 'No',
+            'fgChanges' => $simfile->hasFgChanges() ? 'Yes' : 'No',
+            'bpmChanges' => $simfile->hasBPMChanges() ? 'Yes' : 'No',
+            'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default',
+            'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null,
+            'size' => $simfile->getSimfile() ? Util::bytesToHumanReadable($simfile->getSimfile()->getSize()) : null,
+            'uploaded' => $simfile->getSimfile() ? date('F jS, Y', $simfile->getSimfile()->getUploadDate()) : null
+        );
     }
 }
