@@ -124,7 +124,7 @@ class ZipParser implements IZipParser
     {
         $parser = $this->_smParser;
         $parser->parse($smData);
-        $banner = $this->_bannerExtracter->extractSongBanner('../files/StepMania/' . $this->_file->getHash() . '.zip', $parser->banner());
+        $banner = $this->_bannerExtracter->extractSongBanner(realpath('../files/StepMania/' . $this->_file->getHash() . '.zip'), $parser->banner());
         $file = $this->isPack() ? null : $this->_file;
         
         return $this->_smBuilder->With_Title($parser->title())
