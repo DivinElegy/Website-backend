@@ -36,36 +36,41 @@ class SimfileCacheController implements IDivineController
         //TODO: I should make $req->get('token') give the element and $req->get() return the array maybe?
         if($get['token'] !== $this->_configManager->getDirective('cacheToken')) throw new Exception ('Invalid token');
         
-        $all_files = scandir('../SimfileCache', 1);
-        $most_recent = $all_files[0];
+        $all_files = scandir('../SimfileCache');
+        natsort($all_files);
+        $most_recent = end($all_files);
         $limit = $this->_configManager->getDirective('maxEntitiesToLoad');
         $simfileArray = array();
         $packArray = array();
         $num = 1;
         $simfileId = 0;
         $packId = 0;
-        
-        if($most_recent !== 'simfiles.json')
+
+        if($most_recent !== 'simfiles.json' && $most_recent !== '..')
         {
             $json = json_decode(file_get_contents('../SimfileCache/' . $most_recent));
             $packId = $json->packId;
             $simfileId = $json->simfileId;
-            $num = substr(end(explode('_', $most_recent)),0,1) + 1; //lol
+            $num = explode('_', $most_recent);
+            $num = substr(end($num),0,-5) + 1; //lol
         }
-        
+
         $simfiles = $this->_simfileRepository->findRange($simfileId+1, $limit);
         $packs = $this->_packRepository->findRange($packId+1, $limit);
-
+        
         if(!$simfiles && !$packs)
         {
             $completeArray = array();
-            foreach(glob('../SimfileCache/simfiles_*.json') as $filename)
+            foreach($all_files as $filename)
             {
-                $json = json_decode(file_get_contents($filename), true);
+                if(strpos($filename, 'simfiles_') !== false)
+                {
+                $json = json_decode(file_get_contents('../SimfileCache/' . $filename), true);
                 unset($json['packId']);
                 unset($json['simfileId']);
                 $completeArray = array_merge_recursive($completeArray, $json);
-                unlink($filename);
+                unlink('../SimfileCache/' . $filename);
+                }
             }
             file_put_contents('../SimfileCache/simfiles.json',json_encode($completeArray));
         } else {
