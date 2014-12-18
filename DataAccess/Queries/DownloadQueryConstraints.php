@@ -4,7 +4,7 @@ namespace DataAccess\Queries;
 
 use DataAccess\Queries\IQueryBuilder;
 use DataAccess\Queries\IDownloadQueryConstraints;
-use DateTimeInterface;
+use DateTime;
 
 class DownloadQueryConstraints implements IDownloadQueryConstraints
 {        
@@ -18,7 +18,7 @@ class DownloadQueryConstraints implements IDownloadQueryConstraints
         $this->applyDateRange();
     }
     
-    public function inDateRange(DateTimeInterface $start, DateTimeInterface $end)
+    public function inDateRange(DateTime $start, DateTimeInterface $end)
     {
         $this->_dateRangeStart = $start;
         $this->_dateRangeEnd = $end;
