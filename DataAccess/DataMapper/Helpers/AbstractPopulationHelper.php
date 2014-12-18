@@ -318,7 +318,7 @@ class AbstractPopulationHelper
     {
         //TODO: check if tables are the same and return a constant for that
         //echo '!!! ' . $tableA . ' needs ' . $nameB . ' : ' . $tableB . ' needs ' . $nameA . ' !!!<br />';
-                
+        $dbName = $db->query('select database()')->fetchColumn();
         if($tableA === $tableB)
         {
             return self::REFERENCE_SELF;
@@ -326,7 +326,8 @@ class AbstractPopulationHelper
         
         // first look in table A for a reference to B
         $statement = $db->prepare(sprintf(
-            'SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`="divinelegy" AND `TABLE_NAME`="%s"',
+            'SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`="%s" AND `TABLE_NAME`="%s"',
+            $dbName,
             $tableA));
 
         $statement->execute();
@@ -344,7 +345,8 @@ class AbstractPopulationHelper
         
         // now look in table b for a reference to a
         $statement = $db->prepare(sprintf(
-            'SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`="divinelegy" AND `TABLE_NAME`="%s"',
+            'SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`="%s" AND `TABLE_NAME`="%s"',
+            $dbName,
             $tableB));
 
         $statement->execute();
