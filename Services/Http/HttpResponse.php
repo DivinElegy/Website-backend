@@ -54,14 +54,14 @@ class HttpResponse implements IHttpResponse
         foreach($this->_headers as $headerName => $headerValue) {
             if(!$statusCodeSent) {
                 header(
-                    sprintf('%s:%s', $headerName, $headerValue),
+                    sprintf('%s: %s', $headerName, $headerValue),
                     false,
                     $this->_statusCode);
                 
                 $statusCodeSent = true;
             } else {
                 header(
-                    sprintf('%s:%s', $headerName, $headerValue));
+                    sprintf('%s: %s', $headerName, $headerValue));
             }
         }
         

@@ -185,4 +185,9 @@ class HttpRequest implements IHttpRequest
             
             return $path;
     }
+    
+    public function getHeader($header)
+    {
+        return isset($_SERVER[$header]) ? $_SERVER[$header] : null;
+    }
 }

@@ -5,6 +5,7 @@ namespace Controllers;
 use Exception;
 use Controllers\IDivineController;
 use Services\Http\IHttpResponse;
+use Services\Http\IHttpRequest;
 use Services\Uploads\IUploadManager;
 use Services\IUserSession;
 use Services\IZipParser;
@@ -24,6 +25,7 @@ class SimfileController implements IDivineController
     private $_simfileRepository;
     private $_packRepository;
     private $_fileRepository;
+    private $_request;
     private $_response;
     private $_uploadManager;
     private $_zipParser;
@@ -34,6 +36,7 @@ class SimfileController implements IDivineController
     
     public function __construct(
         IHttpResponse $response,
+        IHttpRequest $request,
         IUploadManager $uploadManager,
         ISimfileRepository $simfileRepository,
         IPackRepository $packRepository,
@@ -45,6 +48,7 @@ class SimfileController implements IDivineController
         IStatusReporter $statusReporter
     ) {
         $this->_response = $response;
+        $this->_request = $request;
         $this->_uploadManager = $uploadManager;
         $this->_simfileRepository = $simfileRepository;
         $this->_packRepository = $packRepository;
@@ -66,9 +70,21 @@ class SimfileController implements IDivineController
         $file = '../SimfileCache/simfiles.json';
         $path = realpath($file);
         
-        $this->_response->setHeader('Content-Type', 'application/json')
-                        ->setBody(file_get_contents($path))
-                        ->sendResponse();
+        //Always set incase list changes
+        $hash = md5_file($path);
+        $this->_response->setHeader('etag', $hash)
+                        ->setHeader('last-modified', gmdate("D, d M Y H:i:s", filemtime($file)) . " GMT")
+                        ->setHeader('cache-control', 'max-age=-1');
+        
+        if($this->_request->getHeader('HTTP_IF_NONE_MATCH') == $hash)
+        {
+            $this->_response->setHeader("HTTP/1.1 304 Not Modified", 'Nice meme!');
+        } else {
+            $this->_response->setHeader('Content-Type', 'application/json')
+                            ->setBody(file_get_contents($path));
+        }
+        
+        $this->_response->sendResponse();
     }
     
     public function latestSimfileAction()

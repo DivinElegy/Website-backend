@@ -50,26 +50,49 @@ class FileController implements IDivineController
     // list simfiles
     public function serveBannerAction($hash)
     {
-        $file = $this->_fileRepository->findByHash($hash);
-        if($hash == 'default') $this->serveDefaultBanner();
-        if(!$file) $this->notFound();
+        //TODO: This DOES NOT check that the file the request is asking for is _actually_
+        //the file we are server. This is because at this stage banners cannot change, we should
+        //be careful maybe.
+        if($this->_request->getHeader('HTTP_IF_MODIFIED_SINCE'))
+        {
+            $this->_response->setHeader("HTTP/1.1 304 Not Modified", 'Nice meme!');
+        } else {
+            $file = $this->_fileRepository->findByHash($hash);
+            if($hash == 'default') $this->serveDefaultBanner();
+            if(!$file) $this->notFound();
 
-        $matches = glob(realpath('../files/' . $file->getPath()) . '/' . $file->getHash() . '.*');
-        $match = reset($matches);
-
-        $this->_response->setHeader('Content-Type', $file->getMimetype())
-                        ->setHeader('Content-Length', $file->getSize())
-                        ->setBody(file_get_contents($match))
-                        ->sendResponse();
+            $matches = glob(realpath('../files/' . $file->getPath()) . '/' . $file->getHash() . '.*');
+            $match = reset($matches);
+            
+            $this->_response->setHeader('Content-Type', $file->getMimetype())
+                            ->setHeader('Content-Length', $file->getSize())
+                            ->setHeader('etag', $file->getHash())
+                            ->setHeader('last-modified', gmdate("D, d M Y H:i:s", $file->getUploadDate()) . " GMT")
+                            ->setHeader('cache-control', 'max-age=-1')
+                            ->setBody(file_get_contents($match));
+        }
+         
+        $this->_response->sendResponse();
     }
     
     private function serveDefaultBanner()
     {
-        $file = '../files/banners/default.png';
-        $this->_response->setHeader('Content-Type', 'image/png')
-                        ->setHeader('Content-Length', filesize($file))
-                        ->setBody(file_get_contents($file))
-                        ->sendResponse();
+        //XXX: As above
+        if($this->_request->getHeader('HTTP_IF_MODIFIED_SINCE'))
+        {
+            $this->_response->setHeader("HTTP/1.1 304 Not Modified", 'Nice meme!');
+        } else {
+            $path = '../files/banners/default.png';
+            $file = realpath($path);
+            $this->_response->setHeader('Content-Type', 'image/png')
+                            ->setHeader('Content-Length', filesize($file))
+                            ->setBody(file_get_contents($file))
+                            ->setHeader('etag', md5_file($file))
+                            ->setHeader('last-modified', gmdate("D, d M Y H:i:s", filemtime($file)) . " GMT")
+                            ->setHeader('cache-control', 'max-age=-1')
+                            ->sendResponse();
+        }
+        
         exit();
     }
     

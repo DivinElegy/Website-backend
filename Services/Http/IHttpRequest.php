@@ -17,6 +17,7 @@ interface IHttpRequest
     public function delete();
     public function cookies();
     public function getBody();
+    public function getHeader($header);
     public function getContentType();
     public function getHost();
     public function getIp();
