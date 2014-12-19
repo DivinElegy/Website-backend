@@ -18,7 +18,7 @@ class DownloadQueryConstraints implements IDownloadQueryConstraints
         $this->applyDateRange();
     }
     
-    public function inDateRange(DateTime $start, DateTimeInterface $end)
+    public function inDateRange(DateTime $start, DateTime $end)
     {
         $this->_dateRangeStart = $start;
         $this->_dateRangeEnd = $end;
