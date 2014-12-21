@@ -99,8 +99,7 @@ class ZipParser implements IZipParser
         //or single, but to do that we simply check the number of found sm files. To overcome this
         //first populate the smFiles array with the raw sm data, then apply SmDataToSmClass on each
         //array element. This way the check is accurate and the array gets populated as expected.
-        //@ing it because when exceptions are thrown this still produces a warning and I dont want that.
-        $this->_smFiles = @array_map(array($this, 'SmDataToSmClass'), $this->_smFiles);
+        $this->_smFiles = array_map(array($this, 'SmDataToSmClass'), $this->_smFiles);
     }
     
     private function packNameFromFiles()

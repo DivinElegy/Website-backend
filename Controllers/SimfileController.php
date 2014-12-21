@@ -132,11 +132,13 @@ class SimfileController implements IDivineController
                                       ->setDestination('StepMania/')
                                       ->process();
 
+        //TODO: This should be in a try-catch and if it fails the file should
+        //be deleted from the filesystem and database.
         foreach($files as $file)
         {
             $zipParser = $this->_zipParser;
             $zipParser->parse($file);
-                   
+
             if(!$zipParser->simfiles()) $this->_statusReporter->error('That zip doesn\'t seem to have any simfiles in it.');
             
             //save the actual zip in the db

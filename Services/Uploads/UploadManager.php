@@ -65,7 +65,7 @@ class UploadManager implements IUploadManager{
     {
         if($this->_destination)
         {
-            $randomName = $this->randomFilename();
+            $randomName = md5_file($file->getTempName());
             $result = move_uploaded_file($file->getTempName(), $this->_basePath . '/' . $this->_destination . '/' . $randomName . '.' . $file->getExtension());
         }
         

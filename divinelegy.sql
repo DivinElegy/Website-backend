@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.38, for debian-linux-gnu (i686)
+-- MySQL dump 10.13  Distrib 5.6.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: divinelegy
 -- ------------------------------------------------------
--- Server version	5.5.38-0ubuntu0.12.04.1
+-- Server version	5.6.12
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -26,7 +26,7 @@ CREATE TABLE `artists` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=360 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=24930 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `downloads` (
   `timestamp` int(10) unsigned NOT NULL,
   `ip` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `files` (
   `size` int(10) unsigned NOT NULL,
   `uploaded` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=291 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=31153 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -78,7 +78,7 @@ CREATE TABLE `mirrors` (
   `file_id` mediumint(8) unsigned NOT NULL,
   `source` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2637 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,7 +95,7 @@ CREATE TABLE `packs` (
   `user_id` mediumint(8) unsigned NOT NULL,
   `banner_file_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2638 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE `simfiles` (
   `simfile_file_id` mediumint(8) unsigned DEFAULT NULL,
   `pack_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=427 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=56572 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `step_artists` (
   `tag` varchar(255) NOT NULL,
   `user_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=162 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5697 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -148,12 +148,12 @@ DROP TABLE IF EXISTS `steps`;
 CREATE TABLE `steps` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `simfile_id` mediumint(8) unsigned NOT NULL,
-  `mode` enum('dance-single','dance-double') NOT NULL,
+  `mode` enum('dance-single','dance-double','dance-couple','dance-solo','dance-threepanel','dance-routine','pump-single','pump-double','pump-couple','pump-halfdouble','pump-routine','kb7-single','ez2-single','ez2-double','ez2-real','para-single','para-versus','ds3ddx-single','bm-single','bm-single5','bm-single7','bm-double','bm-double5','bm-double7','bm-versus5','bm-versus7','iidx-single','iidx-single5','iidx-single7','iidx-double','iidx-double5','iidx-double7','iidx-versus5','iidx-versus7','maniax-single','maniax-double','techno-single4','techno-single5','techno-single8','techno-double4','techno-double5','techno-double8','pnm-five','pnm-nine') DEFAULT NULL,
   `rating` int(10) unsigned NOT NULL,
-  `difficulty` enum('Beginner','Easy','Medium','Hard','Challenge','Edit') NOT NULL,
+  `difficulty` enum('Beginner','Easy','Medium','Hard','Challenge','Edit') DEFAULT NULL,
   `step_artist_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=481 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=159447 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,12 +165,11 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
   `display_name` varchar(255) NOT NULL,
   `facebook_id` varchar(255) DEFAULT NULL,
   `quota` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -187,7 +186,7 @@ CREATE TABLE `users_meta` (
   `lastname` varchar(255) DEFAULT NULL,
   `country` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -199,4 +198,4 @@ CREATE TABLE `users_meta` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-05 14:59:50
+-- Dump completed on 2014-12-22  2:44:50

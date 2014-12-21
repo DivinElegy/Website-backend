@@ -8,14 +8,6 @@ use Exception;
 class SimfileParser implements ISimfileParser
 {
     
-//        'light' => 'Novice',
-//        'beginner' => 'Novice',
-//        'easy' => 'Easy',
-//        'medium' => 'Medium',
-//        'hard' => 'Hard',
-//        'challenge' => 'Expert',
-//        'edit' => 'Edit'
-    
     private $_smFileLines;
         
     public function parse($simfileData)
@@ -33,7 +25,8 @@ class SimfileParser implements ISimfileParser
         $title = $this->extractKey('TITLE');
         if(!$title) throw new Exception ('Invalid SM file. TITLE missing');
         
-        return $title;
+        //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
+        return utf8_encode($title);
     }
     
     public function artist()
@@ -41,13 +34,16 @@ class SimfileParser implements ISimfileParser
         $artist = $this->extractKey('ARTIST');
         if(!$artist) throw new Exception ('Invalid SM file. ARTIST missing');
         
-        return new \Domain\VOs\StepMania\Artist($artist);
+        //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
+        return new \Domain\VOs\StepMania\Artist(utf8_encode($artist));
     }
     
     public function stops()
     {
         $stops = $this->extractKey('STOPS');
-        if($stops === false) throw new Exception ('Invalid SM file. STOPS missing');
+        
+        //XXX: SM files can be missing stops.
+        //if($stops === false) throw new Exception ('Invalid SM file. STOPS missing');
         
         return (bool)$stops;
     }
@@ -69,19 +65,26 @@ class SimfileParser implements ISimfileParser
         {
             $bpmRange = explode(":",$displayBpm);
             $bpmRange[1] = @$bpmRange[1] ?: $bpmRange[0];
-        } else {
+        }
+        
+        //XXX: Originally I had an else statement for this. But turns out some SM's have * as the display bpm
+        //so I just check if we don't have a displayBPM OR the displayBPM is not numeric.
+        if(!$displayBpm || !is_numeric($bpmRange[0]))
+        {
             $bpms = $this->extractKey('BPMS');
             $bpmRange = $this->parseBpms($bpms);
         }
         
-        //I have nfi why I made the BPM VO high-low instead of low-high in the constructor but yolo
+        //XXX: I have nfi why I made the BPM VO high-low instead of low-high in the constructor but yolo
         return new \Domain\VOs\StepMania\BPM($bpmRange[1], $bpmRange[0]);
     }
     
     public function bgChanges()
     {
         $bgChanges = $this->extractKey('BGCHANGES');
-        if($bgChanges === false) throw new Exception ('Invalid SM file. BGCHANGES missing');
+        
+        //XXX: BGChanges can be missing
+        //if($bgChanges === false) throw new Exception ('Invalid SM file. BGCHANGES missing');
         
         return (bool)$bgChanges;
     }
@@ -89,7 +92,9 @@ class SimfileParser implements ISimfileParser
     public function bpmChanges() 
     {
         $bpms = $this->extractKey('BPMS');
-        if(!$bpms) throw new Exception ('Invalid SM file. BPMS missing');
+        
+        //XXX: BPMS can be missing.
+        //if(!$bpms) throw new Exception ('Invalid SM file. BPMS missing');
         
         $bpmRange = $this->parseBpms($bpms);
         //XXX: We have bpm changes when the high and low bpms are different.
@@ -115,7 +120,11 @@ class SimfileParser implements ISimfileParser
             if ($pos !== false)
             {
                 $noteData = trim(substr($line, $pos + 9));
-                $allSteps[] = $this->stepchartFromNoteData($noteData);
+                $steps = $this->stepchartFromNoteData($noteData);
+                
+                //XXX: Sometimes we get a cabinet lights chart, those return false for getGame.
+                //We don't want to store cabinet lights, so just ignore it.
+                if($steps->getMode()->getGame()) $allSteps[] = $steps;
             }
         }
         

@@ -31,7 +31,7 @@ class BannerExtracter implements IBannerExtracter
             $stat = $za->statIndex($i);
             if(basename($stat['name']) == $bannerName)
             {
-                $this->_hash = $this->randomFilename($bannerName);
+                $this->_hash = md5_file('zip://' . $zipfile . '#' . $stat['name']);
                 $this->_destinationFileName = $this->_hash . '.' . pathinfo($bannerName, PATHINFO_EXTENSION);
                 $result = copy('zip://' . $zipfile . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);
                 break;
@@ -74,7 +74,7 @@ class BannerExtracter implements IBannerExtracter
                 //replace 3spooty with packname variable
                 if(count($pathComponents) == 2 && $pathComponents[0] == $packname)
                 {
-                    $this->_hash = $this->randomFilename($stat['name']);
+                    $this->_hash = md5_file('zip://' . realpath($zipfile) . '#' . $stat['name']);
                     $this->_destinationFileName = $this->_hash . '.' . pathinfo($stat['name'], PATHINFO_EXTENSION);
                     $bannerName = $pathComponents[1];
                     $result = copy('zip://' . realpath($zipfile) . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);

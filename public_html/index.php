@@ -12,6 +12,9 @@ if($config['mode'] == 'production')
 {
     ini_set('display_errors', 0);
     set_exception_handler(array('\Services\StatusReporter', 'exception'));
+} else {
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
 }
 
 // Everything time related should be UTC+0 based
