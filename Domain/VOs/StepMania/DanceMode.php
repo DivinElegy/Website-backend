@@ -56,6 +56,7 @@ class DanceMode implements IDanceMode
         'techno-double8' => 'Double 8 Panel',
         'pnm-five' => 'Five Key',
         'pnm-nine' => 'Nine Key',
+        'guitar-five' => '5 Fret',
         'lights-cabinet' => 'Cabinet Lights'
     );
     
@@ -71,6 +72,7 @@ class DanceMode implements IDanceMode
         'pnm' => 'Pop\'n Music',
         'ds3ddx' => 'Dance Station 3DDX',
         'kb7' => 'Keybeat',
+        'guitar' => 'Guitar Hero',
         'lights' => false
     );
             

@@ -6,8 +6,9 @@ use Exception;
 
 interface IStatusReporter
 {
-    public function success($message);
-    public function error($message);
+    public function success($message = null);
+    public function error($message = null);
+    public function addMessage($message);
     public static function exception(Exception $exception);
     public function json();
 }

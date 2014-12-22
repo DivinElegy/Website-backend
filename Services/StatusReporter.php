@@ -8,7 +8,7 @@ use Services\IStatusReporter;
 
 class StatusReporter implements IStatusReporter
 {
-    private $_message;
+    private $_messages = array();
     private $_type;
     private $_response;
     
@@ -20,9 +20,9 @@ class StatusReporter implements IStatusReporter
         $this->_response = $response;
     }
     
-    public function error($message)
+    public function error($message = null)
     {
-        $this->_message = $message;
+        if($message) $this->addMessage($message);
         $this->_type = self::ERROR;
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody($this->json())
@@ -30,9 +30,9 @@ class StatusReporter implements IStatusReporter
         exit();
     }
     
-    public function success($message)
+    public function success($message = null)
     {
-        $this->_message = $message;
+        if($message) $this->addMessage($message);
         $this->_type = self::SUCCESS;
         $this->_response->setHeader('Content-Type', 'application/json')
                         ->setBody($this->json())
@@ -40,18 +40,27 @@ class StatusReporter implements IStatusReporter
         exit();
     }
     
+    public function addMessage($message)
+    {
+        $this->_messages[] = $message;;
+    }
+    
     //no need to exit here, exceptions stop the program.
     public static function exception(Exception $exception)
     {       
         //we'll be instatic context here so I have to do it this way.
         header('Content-Type: application/json');
-        echo json_encode(array(self::EXCEPTION => $exception->getMessage()));
+        echo json_encode(array(
+            'status' => self::EXCEPTION,
+            'messages' => array($exception->getMessage())));
     }
     
     public function json()
     {
         return json_encode(
-            array($this->_type => $this->_message)
+            array(
+                'status' => $this->_type,
+                'messages' => $this->_messages)
         );
     }
 }

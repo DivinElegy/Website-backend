@@ -2,13 +2,22 @@
 
 namespace Services;
 
-use Services\ISimfileParser;
 use Exception;
+use Services\ISimfileParser;
+use Services\IStatusReporter;
+
+class InvalidSmFileException extends Exception{}
 
 class SimfileParser implements ISimfileParser
 {
     
     private $_smFileLines;
+    private $_statusReporter;
+    
+    public function __construct(IStatusReporter $statusReporter)
+    {
+        $this->_statusReporter = $statusReporter;
+    }
         
     public function parse($simfileData)
     {
@@ -23,7 +32,7 @@ class SimfileParser implements ISimfileParser
     public function title()
     {
         $title = $this->extractKey('TITLE');
-        if(!$title) throw new Exception ('Invalid SM file. TITLE missing');
+        if(!$title) throw new InvalidSmFileException('Invalid SM file. TITLE missing');
         
         //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
         return utf8_encode($title);
@@ -65,7 +74,7 @@ class SimfileParser implements ISimfileParser
         if($displayBpm)
         {
             $bpmRange = explode(":",$displayBpm);
-            $bpmRange[1] = @$bpmRange[1] ?: $bpmRange[0];
+            $bpmRange[1] = isset($bpmRange[1]) && is_numeric($bpmRange[1]) ?: $bpmRange[0];
         }
         
         //XXX: Originally I had an else statement for this. But turns out some SM's have * as the display bpm
@@ -105,7 +114,7 @@ class SimfileParser implements ISimfileParser
     public function subtitle()
     {
         $subtitle = $this->extractKey('SUBTITLE');
-        if(!$subtitle) throw new Exception ('Invalid SM file. SUBTITLE missing');
+        if(!$subtitle) return null;
         
         return $subtitle;
     }
@@ -122,14 +131,14 @@ class SimfileParser implements ISimfileParser
             {
                 $noteData = trim(substr($line, $pos + 9));
                 $steps = $this->stepchartFromNoteData($noteData);
-                
+
                 //XXX: Sometimes we get a cabinet lights chart, those return false for getGame.
                 //We don't want to store cabinet lights, so just ignore it.
                 if($steps->getMode()->getGame()) $allSteps[] = $steps;
             }
         }
         
-        if(empty($allSteps)) throw new Exception('Invalid Sm file. NOTES missing');
+        if(empty($allSteps)) throw new InvalidSmFileException('Invalid Sm file. NOTES missing');
         return $allSteps;
     }
     
@@ -139,13 +148,15 @@ class SimfileParser implements ISimfileParser
         return new \Domain\VOs\StepMania\StepChart(
             new \Domain\VOs\StepMania\DanceMode($stepData[0]),
             new \Domain\VOs\StepMania\Difficulty($stepData[2]),
-            empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist($stepData[1]),
-            $stepData[3]
+            empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist(utf8_encode($stepData[1])),
+            //XXX: Fuck you whoever made me do this. http://dev.mysql.com/doc/refman/5.5/en/integer-types.html
+            $stepData[3] <= 18446744073709551615 ? $stepData[3] : 9999999999999999999
         );
     }
     
     private function extractKey($key)
     {
+        //Throw regular exception here, this has nothing to do with the SM file.
         if(empty($this->_smFileLines)) throw new Exception('SM file data not set.');
         
         foreach ($this->_smFileLines as $line)
@@ -164,13 +175,18 @@ class SimfileParser implements ISimfileParser
 
         foreach($bpms as $bpm)
         {
-                $bpmMeasure = explode('=', $bpm);
-                $bpmValue = floatval($bpmMeasure[1]);
+            $bpmMeasure = explode('=', $bpm);
+            $bpmValue = floatval($bpmMeasure[1]);
 
-                if(empty($bpmRange['low'])) $bpmRange['low'] = $bpmRange['high'] = $bpmValue;
+            if(empty($bpmRange['low'])) $bpmRange['low'] = $bpmRange['high'] = $bpmValue;
 
+            //XXX: Anything bigger or smaller than this cannot be stored by MySQLs bigint type http://dev.mysql.com/doc/refman/5.5/en/integer-types.html
+            //fuck you if your simfile has bpms this high/low what's wrong with you.
+            if($bpmValue <= 9223372036854775807 && $bpmValue >= -9223372036854775808)
+            {
                 $bpmRange['high'] = ($bpmValue > $bpmRange['high']) ? $bpmValue : $bpmRange['high'];
                 $bpmRange['low'] = ($bpmValue < $bpmRange['low']) ? $bpmValue : $bpmRange['low'];
+            }
         }
         
         return array($bpmRange['low'], $bpmRange['high']);

@@ -140,7 +140,7 @@ class SimfileController implements IDivineController
             $zipParser->parse($file);
 
             if(!$zipParser->simfiles()) $this->_statusReporter->error('That zip doesn\'t seem to have any simfiles in it.');
-            
+
             //save the actual zip in the db
             $this->findAndAddSmoMirror($file);
             $this->_fileRepository->save($file);  

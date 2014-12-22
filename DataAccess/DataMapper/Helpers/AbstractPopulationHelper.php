@@ -373,7 +373,8 @@ class AbstractPopulationHelper
         
         foreach($columns as $columnName => $columnValue)
         {
-            $query .= sprintf('%s="%s" AND ', $columnName, str_replace('"', '\"', $columnValue));
+            $columnValue = $db->quote($columnValue);
+            $query .= sprintf('%s=%s AND ', $columnName, str_replace('"', '\"', $columnValue));
         }
         
         $query = substr($query, 0, -4);

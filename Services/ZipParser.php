@@ -3,6 +3,8 @@
 namespace Services;
 
 use Exception;
+use Domain\Exception\InvalidDifficultyException;
+use Domain\Exception\InvalidDanceModeException;
 use ZipArchive;
 use Services\ISimfileParser;
 use Services\IBannerExtracter;
@@ -11,6 +13,8 @@ use Domain\Entities\StepMania\ISimfileStepByStepBuilder;
 use Domain\Entities\StepMania\IPackStepByStepBuilder;
 use Services\IZipParser;
 use Services\IUserSession;
+use Services\IStatusReporter;
+use Services\InvalidSmFileException;
 
 class ZipParser implements IZipParser
 {
@@ -22,19 +26,22 @@ class ZipParser implements IZipParser
     private $_bannerExtracter;
     private $_userSession;
     private $_file;
+    private $_statusReporter;
     
     public function __construct(
         ISimfileParser $smParser,
         ISimfileStepByStepBuilder $smBuilder,
         IPackStepByStepBuilder $packBuilder,
         IBannerExtracter $bannerExtracter,
-        IUserSession $userSession
+        IUserSession $userSession,
+        IStatusReporter $statusReporter
     ) {
         $this->_smParser = $smParser;
         $this->_smBuilder = $smBuilder;
         $this->_packBuilder = $packBuilder;
         $this->_bannerExtracter = $bannerExtracter;
         $this->_userSession = $userSession;
+        $this->_statusReporter = $statusReporter;
     }
     
     public function parse(IFile $file)
@@ -99,7 +106,26 @@ class ZipParser implements IZipParser
         //or single, but to do that we simply check the number of found sm files. To overcome this
         //first populate the smFiles array with the raw sm data, then apply SmDataToSmClass on each
         //array element. This way the check is accurate and the array gets populated as expected.
-        $this->_smFiles = array_map(array($this, 'SmDataToSmClass'), $this->_smFiles);
+        foreach($this->_smFiles as $index => $data)
+        {
+            try
+            {
+                $this->_smFiles[$index] = $this->SmDataToSmClass($data);
+            } catch(Exception $e) {
+                //Exceptions we care about at this stage
+                if(!$e instanceof InvalidSmFileException && 
+                   !$e instanceof InvalidDanceModeException &&
+                   !$e instanceof InvalidDifficultyException)
+                {
+                    throw $e;
+                }
+
+                //Add to messages.
+                $this->_statusReporter->addMessage($e->getMessage() . ' in ' . $index);
+                unset($this->_smFiles[$index]);
+            }
+        }
+        //$this->_smFiles = array_map(array($this, 'SmDataToSmClass'), $this->_smFiles);
     }
     
     private function packNameFromFiles()
@@ -125,7 +151,7 @@ class ZipParser implements IZipParser
         $parser->parse($smData);
         $banner = $this->_bannerExtracter->extractSongBanner(realpath('../files/StepMania/' . $this->_file->getHash() . '.zip'), $parser->banner());
         $file = $this->isPack() ? null : $this->_file;
-        
+
         return $this->_smBuilder->With_Title($parser->title())
                                 ->With_Artist($parser->artist())
                                 ->With_Uploader($this->_userSession->getCurrentUser()) //obj
