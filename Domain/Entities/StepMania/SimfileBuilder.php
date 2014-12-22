@@ -36,7 +36,7 @@ class SimfileBuilder implements ISimfileBuilder
         return $this;
     }
     
-    public function With_Artist(IArtist $artist) {
+    public function With_Artist(IArtist $artist = null) {
         $this->_artist = $artist;
         return $this;
     }

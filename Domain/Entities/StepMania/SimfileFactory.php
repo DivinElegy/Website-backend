@@ -12,7 +12,7 @@ interface ISimfileFactory
 {
     public function createInstance(
         $title,
-        IArtist $artist,
+        IArtist $artist = null,
         IUser $uploader,
         IBPM $bpm,
         $bpmChanges,
@@ -30,7 +30,7 @@ class SimfileFactory implements ISimfileFactory
 {
     public function createInstance(
         $title,
-        IArtist $artist,
+        IArtist $artist = null,
         IUser $uploader,
         IBPM $bpm,
         $bpmChanges,

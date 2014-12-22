@@ -29,7 +29,7 @@ class Simfile extends AbstractEntity implements ISimfile
     
     public function __construct(
         $title,
-        IArtist $artist,
+        IArtist $artist = null,
         IUser $uploader,
         IBPM $bpm,
         $bpmChanges,

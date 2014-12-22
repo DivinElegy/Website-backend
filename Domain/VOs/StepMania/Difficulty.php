@@ -42,7 +42,7 @@ class Difficulty implements IDifficulty
     );
 
     public function __construct($name) {
-        $ucName = ucfirst($name);
+        $ucName = ucfirst(strtolower($name));
         if(array_key_exists($ucName, $this->_namesToSmNames)) {
             $this->stepManiaName = $this->_namesToSmNames[$ucName];
             $this->itgName = $this->_smNamesToItgNames[$this->stepManiaName];

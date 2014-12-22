@@ -15,11 +15,7 @@ interface ISimfileStepByStepBuilder
 
 interface ISimfileStepByStepBuilder_With_Title
 {
-    public function With_Artist(IArtist $artist);
-}
-
-interface ISimfileStepByStepBuilder_With_Artist
-{
+    public function With_Artist(IArtist $artist = null);
     public function With_Uploader(IUser $uploader);
 }
 
@@ -85,15 +81,12 @@ class SimfileStepByStepBuilder extends AbstractSimfileStepByStepBuilder implemen
 
 class SimfileStepByStepBuilder_With_Title extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Title
 {        
-    public function With_Artist(IArtist $artist)
+    public function With_Artist(IArtist $artist = null)
     {
         $this->_simfileBuilder->With_Artist($artist);
-        return new SimfileStepByStepBuilder_With_Artist($this->_simfileBuilder);
+        return $this;
     }
-}
-
-class SimfileStepByStepBuilder_With_Artist extends AbstractSimfileStepByStepBuilder implements ISimfileStepByStepBuilder_With_Artist
-{        
+    
     public function With_Uploader(IUser $uploader)
     {
         $this->_simfileBuilder->With_Uploader($uploader);

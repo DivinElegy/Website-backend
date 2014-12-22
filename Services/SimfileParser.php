@@ -32,7 +32,8 @@ class SimfileParser implements ISimfileParser
     public function artist()
     {
         $artist = $this->extractKey('ARTIST');
-        if(!$artist) throw new Exception ('Invalid SM file. ARTIST missing');
+        //XXX: Artist can be null
+        if(!$artist)return null;
         
         //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
         return new \Domain\VOs\StepMania\Artist(utf8_encode($artist));
