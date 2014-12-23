@@ -297,7 +297,8 @@ class Util
             'banner' => $pack->getBanner() ? 'files/banner/' . $pack->getBanner()->getHash() : 'files/banner/default',
             'mirrors' => self::getPackMirrorsArray($pack),
             'size' => $pack->getFile() ? self::bytesToHumanReadable($pack->getFile()->getSize()) : null,
-            'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null
+            'uploaded' => $pack->getFile() ? date('F jS, Y', $pack->getFile()->getUploadDate()) : null,
+            'hash' => $pack->getFile() ? $pack->getFile()->getHash() : null
         );
     }
     
@@ -366,7 +367,8 @@ class Util
             'banner' => $simfile->getBanner() ? 'files/banner/' . $simfile->getBanner()->getHash() : 'files/banner/default',
             'download' => $simfile->getSimfile() ?  'files/simfile/' . $simfile->getSimfile()->getHash() : null,
             'size' => $simfile->getSimfile() ? Util::bytesToHumanReadable($simfile->getSimfile()->getSize()) : null,
-            'uploaded' => $simfile->getSimfile() ? date('F jS, Y', $simfile->getSimfile()->getUploadDate()) : null
+            'uploaded' => $simfile->getSimfile() ? date('F jS, Y', $simfile->getSimfile()->getUploadDate()) : null,
+            'hash' => $simfile->getSimfile() ? $simfile->getSimfile()->getHash() : null
         );
     }
 }
