@@ -150,7 +150,8 @@ class SimfileParser implements ISimfileParser
             new \Domain\VOs\StepMania\Difficulty($stepData[2]),
             empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist(utf8_encode($stepData[1])),
             //XXX: Fuck you whoever made me do this. http://dev.mysql.com/doc/refman/5.5/en/integer-types.html
-            $stepData[3] <= 18446744073709551615 ? $stepData[3] : 9999999999999999999
+            //XXX: Originally I was using MySQL unsigned bigint max value, but PHP does not have unsigned ints so
+            $stepData[3] <= 9223372036854775807 ? $stepData[3] : 9223372036854775807
         );
     }
     

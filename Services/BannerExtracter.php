@@ -29,7 +29,9 @@ class BannerExtracter implements IBannerExtracter
         for($i=0; $i<$za->numFiles; $i++)
         {
             $stat = $za->statIndex($i);
-            if(basename($stat['name']) == $bannerName)
+            $type = @exif_imagetype('zip://' . realpath($zipfile) . '#' . $stat['name']);
+            //Sometimes simfiles specify a video as their banner. Fuck dat.
+            if(basename($stat['name']) == $bannerName && $type !== false)
             {
                 $this->_hash = md5_file('zip://' . $zipfile . '#' . $stat['name']);
                 $this->_destinationFileName = $this->_hash . '.' . pathinfo($bannerName, PATHINFO_EXTENSION);
