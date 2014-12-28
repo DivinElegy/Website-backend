@@ -3,6 +3,7 @@ logs
 composer.lock
 vendor
 db.php
+files/*
 files/StepMania/*
 files/banners/*
 !files/banners/default.png

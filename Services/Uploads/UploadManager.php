@@ -26,7 +26,7 @@ class UploadManager implements IUploadManager{
             foreach($_FILES as $file)
             {
                 $this->_files[] = $this->_fileFactory->createInstance(
-                utf8_encode($file['name']),
+                    $file['name'],
                     $file['type'],
                     $file['tmp_name'],
                     $file['size']

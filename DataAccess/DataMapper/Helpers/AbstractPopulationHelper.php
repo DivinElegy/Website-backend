@@ -202,6 +202,8 @@ class AbstractPopulationHelper
                         }
                         break;
                     case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
+                        //XXX: pls magically fix all my character encoding issues.
+                        $property = mb_convert_encoding($property, "UTF-8", mb_detect_encoding($property, "UTF-8, ISO-8859-1, ISO-8859-15", true));
                         if($id){
                             //easy case, plain values in our table.
                             $query .= sprintf('%s="%s", ',

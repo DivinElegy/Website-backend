@@ -33,9 +33,8 @@ class SimfileParser implements ISimfileParser
     {
         $title = $this->extractKey('TITLE');
         if(!$title) throw new InvalidSmFileException('Invalid SM file. TITLE missing');
-        
-        //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
-        return utf8_encode($title);
+
+        return $title;
     }
     
     public function artist()
@@ -45,7 +44,7 @@ class SimfileParser implements ISimfileParser
         if(!$artist)return null;
         
         //XXX: UTF8 encode to deal with unusual character that crop up in weeaboo shit.
-        return new \Domain\VOs\StepMania\Artist(utf8_encode($artist));
+        return new \Domain\VOs\StepMania\Artist($artist);
     }
     
     public function stops()
@@ -148,7 +147,7 @@ class SimfileParser implements ISimfileParser
         return new \Domain\VOs\StepMania\StepChart(
             new \Domain\VOs\StepMania\DanceMode($stepData[0]),
             new \Domain\VOs\StepMania\Difficulty($stepData[2]),
-            empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist(utf8_encode($stepData[1])),
+            empty($stepData[1]) ? null : new \Domain\VOs\StepMania\StepArtist($stepData[1]),
             //XXX: Fuck you whoever made me do this. http://dev.mysql.com/doc/refman/5.5/en/integer-types.html
             //XXX: Originally I was using MySQL unsigned bigint max value, but PHP does not have unsigned ints so
             $stepData[3] <= 9223372036854775807 ? $stepData[3] : 9223372036854775807

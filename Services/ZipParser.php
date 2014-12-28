@@ -142,7 +142,7 @@ class ZipParser implements IZipParser
                 throw new Exception('Malformed zip. I found more than 1 sm file but the directory structure is not consistent with a pack.');
         }
         
-        return utf8_encode($packName);
+        return $packName;
     }
         
     private function SmDataToSmClass($smData)
