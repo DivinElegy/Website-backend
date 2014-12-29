@@ -56,7 +56,7 @@ class DataMapper implements IDataMapper
                 $class = $r->newInstanceArgs($constructors);
             }
 
-            $class->setId($row['id']);
+            $class->setId((int)$row['id']);
             $entities[$row['id']] = $class;
         }
                 
@@ -70,7 +70,7 @@ class DataMapper implements IDataMapper
             $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
             $mergeMap = array();
             $flattened = array();
-
+            
             foreach($queries as $index => $query)
             {
                 $this_table = $query['table'];
@@ -155,7 +155,7 @@ class DataMapper implements IDataMapper
 
                 $queries[$index] = $query;
             }
-            
+
            // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)
            // {
                 $idMap = [];

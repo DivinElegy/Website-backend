@@ -368,9 +368,21 @@ class AbstractPopulationHelper
     {
         $mapsIndex = self::getMapsNameFromEntityObject($VO, $maps);
         $table = $maps[$mapsIndex]['table'];
-        
-        $columns = array_merge(self::resolveColumnNamesAndValues($maps, $VO), $extraColumns);
-        
+
+        //TODO: This may break everythign, but I _think_ if I pass extraColuns, it is always an id column.
+        //I also think that this method is only called when we are trying to work out a VO (NOT a VOArray)
+        //in which case there should be one unique row somewhere in the database that corresponds to the VO
+        //we want, in that case we can just find it by id. Throwing in more columns causes issues trying to
+        //update an existing VO because it uses the values of the current object, which we are trying to save,
+        //so it never finds the existing row and therefore makes a whole new one, which ruins everything.
+        if($extraColumns)
+        {
+            $columns = $extraColumns;
+        } else {
+            //I only had this before, I think I don't actually need to do this merge but I'm leaving it incase
+            $columns = array_merge(self::resolveColumnNamesAndValues($maps, $VO), $extraColumns);
+        }
+
         $query = "SELECT * FROM $table where ";
         
         foreach($columns as $columnName => $columnValue)
@@ -380,6 +392,7 @@ class AbstractPopulationHelper
         }
         
         $query = substr($query, 0, -4);
+
         $statement = $db->prepare($query);
         $statement->execute();
         $row = $statement->fetch();
