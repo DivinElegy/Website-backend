@@ -68,4 +68,14 @@ class User extends AbstractEntity implements IUser
     {
         return $this->_quota;
     }
+    
+    public function setDisplayName($displayName)
+    {
+        $this->_displayName = $displayName;
+    }
+    
+    public function setCountry(ICountry $country)
+    {
+        $this->_country = $country;
+    }
 }

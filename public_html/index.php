@@ -6,6 +6,7 @@ $config = require('../config/app.php');
 
 // Allow these origins to do cross domain JS.
 header("Access-Control-Allow-Origin: " . $config['allow-origin']);
+header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
 // Nice exceptions
 if($config['mode'] == 'production')

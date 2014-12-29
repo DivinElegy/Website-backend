@@ -2,6 +2,8 @@
 
 namespace Domain\Entities;
 
+use Domain\VOs\ICountry;
+
 interface IUser
 {
     public function setId($id);
@@ -14,4 +16,7 @@ interface IUser
     public function getFacebookId();
     public function setFacebookId($id);
     public function getQuota();
+    
+    public function setDisplayName($displayName);
+    public function setCountry(ICountry $country);
 }

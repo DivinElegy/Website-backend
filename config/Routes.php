@@ -47,15 +47,9 @@ return [
     '/user/:facebookId' => [
         'controller' => 'User',
         'actions' => [
-            'GET' => 'getUser'
+            'GET' => 'getUser',
+            'POST' => 'update'
          ]
-    ],
-    
-    '/user' => [
-        'controller' => 'User',
-        'actions' => [
-            'POST' => 'update',
-        ]
     ],
 
     '/files/banner/:hash' => [
