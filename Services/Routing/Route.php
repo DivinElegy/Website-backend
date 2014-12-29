@@ -13,12 +13,12 @@ class Route implements IRoute
     private $_argNames;
     private $_argValues;
     
-    public function __construct($pattern, array $methods, $controllerName, $actionName = null)
+    public function __construct($pattern, array $actions, $controllerName)
     {
         $this->_controllerName = $controllerName;
-        $this->_actionName = $actionName;
+        $this->_actions = $actions;
+        $this->_methods = array_keys($actions);
         $this->_pattern = $pattern;
-        $this->_methods = $methods;
     }
     
     public function matches($path) {
@@ -62,9 +62,9 @@ class Route implements IRoute
         return $this->_controllerName;
     }
     
-    public function getActionName()
+    public function getActionName($method)
     {
-        return $this->_actionName;
+        return $this->_actions[$method];
     }
     
     public function getActionArgs()

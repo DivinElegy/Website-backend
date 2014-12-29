@@ -19,12 +19,12 @@ class Router implements IRouter
         
         foreach($this->_maps as $pattern => $routeInfo)
         {
-            $methods = isset($routeInfo['methods']) ? $routeInfo['methods'] : array('GET');
+            //$methods = isset($routeInfo['methods']) ? $routeInfo['methods'] : array('GET');
             $controller = isset($routeInfo['controller']) ? $routeInfo['controller'] : 'index';
-            $action = isset($routeInfo['action']) ? $routeInfo['action'] : 'index';
+            $actions = isset($routeInfo['actions']) ? $routeInfo['actions'] : array('GET' => 'index');
             
             //TODO: really I should be using a builder or a factory with DI for this but yolo.
-            $this->_routes[] = new Route($pattern, $methods, $controller, $action);
+            $this->_routes[] = new Route($pattern, $actions, $controller);
         }
     }
     
@@ -37,7 +37,7 @@ class Router implements IRouter
     public function getActionName()
     {
         $matchedRoute = $this->findMatch();
-        return $matchedRoute ? $matchedRoute->getActionName() : 'index';
+        return $matchedRoute ? $matchedRoute->getActionName($this->_request->getMethod()) : 'index';
     }
     
     public function getActionArgs()

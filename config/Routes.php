@@ -2,72 +2,81 @@
 
 return [
     '/simfiles' => [
-        'methods' => ['GET'],
         'controller' => 'Simfile',
-        'action' => 'list'
+        'actions' => [
+            'GET'=> 'list'
+        ]
     ],
     
     '/simfiles/latest/simfile' => [
-        'methods' => ['GET'],
         'controller' => 'Simfile',
-        'action' => 'latestSimfile'
+        'actions' => [
+            'GET' => 'latestSimfile'
+        ]
     ],
     
     '/simfiles/latest/pack' => [
-        'methods' => ['GET'],
         'controller' => 'Simfile',
-        'action' => 'latestPack'
+        'actions' => [
+            'GET' => 'latestPack'
+        ]
     ],
     
     '/simfiles/popular' => [
-        'methods' => ['GET'],
         'controller' => 'Simfile',
-        'action' => 'popular'
+        'actions' => [
+            'GET' => 'popular'
+        ]
     ],
     
     '/simfiles/upload' => [
-        'methods' => ['POST'],
         'controller' => 'Simfile',
-        'action' => 'upload'
+        'actions' => [
+            'POST' => 'upload'
+        ]
     ],
     
     '/cache/update' => [
-        'methods' => ['GET'],
         'controller' => 'SimfileCache',
     ],
     
-    '/simfiles/argTest/:testarg' => [
-        'methods' => ['GET'],
-        'controller' => 'Simfile',
-        'action' => 'test'
-    ],
-    
     '/user/auth' => [
-        'method' => ['GET'],
         'controller' => 'UserAuth'
     ],
     
     '/user/:facebookId' => [
-        'method' => ['GET'],
         'controller' => 'User',
-        'action' => 'getUser'
+        'actions' => [
+            'GET' => 'getUser'
+         ]
     ],
     
+    '/user' => [
+        'controller' => 'User',
+        'actions' => [
+            'POST' => 'update',
+        ]
+    ],
+
     '/files/banner/:hash' => [
-        'method' => ['GET'],
         'controller' => 'File',
-        'action' => 'serveBanner'
+        'actions' => [
+            'GET' => 'serveBanner'
+        ]
     ],
     
     '/files/pack/:hash' => [
-        'method' => ['GET'],
         'controller' => 'File',
-        'action' => 'serveSimfileOrPack'
+        'actions' => [
+            'GET' => 'serveSimfileOrPack'
+         ]
     ],
     
     '/files/simfile/:hash' => [
-        'method' => ['GET'],
+        'methods' => ['GET'],
         'controller' => 'File',
-        'action' => 'serveSimfileOrPack'
+        'actions' => [
+            'GET' => 'serveSimfileOrPack'
+        ]
     ]
 ];
