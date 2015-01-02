@@ -18,7 +18,7 @@ class User extends AbstractEntity implements IUser
     private $_quota;
     
     public function __construct(
-        ICountry $country,
+        ICountry $country = null,
         $displayName,
         IName $name,
         array $tags,
@@ -74,7 +74,7 @@ class User extends AbstractEntity implements IUser
         $this->_displayName = $displayName;
     }
     
-    public function setCountry(ICountry $country)
+    public function setCountry(ICountry $country = null)
     {
         $this->_country = $country;
     }

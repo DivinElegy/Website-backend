@@ -53,7 +53,7 @@ class UserController implements IDivineController
             'name' => $user->getName()->getFullName(),
             'displayName' => $user->getDisplayName(),
             'tags' => $user->getTags(),
-            'country' => $user->getCountry()->getCountryName(),
+            'country' => $user->getCountry() ? $user->getCountry()->getCountryName() : null,
         );
         
         if($this->_userSession->getCurrentUser())
@@ -75,8 +75,12 @@ class UserController implements IDivineController
         try
         {
             if(isset($userUpdateData->displayName)) $user->setDisplayName($userUpdateData->displayName);
-            //TODO: Direct instantiation bad?
-            if(isset($userUpdateData->country)) $user->setCountry(new Country($userUpdateData->country));
+            
+            if(property_exists($userUpdateData,'country'))
+            {
+                //TODO: Direct instantiation bad?
+                $user->setCountry(isset($userUpdateData->country) ? new Country($userUpdateData->country) : null);
+            }
             $this->_userRepository->save($user);
         } catch (Exception $e) {
             if(strpos($e->getMessage(), 'Duplicate entry') !== false)

@@ -2,6 +2,7 @@
 
 namespace DataAccess\DataMapper\Helpers;
 
+use Exception;
 use ReflectionClass;
 
 class VOMapsHelper
@@ -79,8 +80,12 @@ class VOMapsHelper
         {
             return new $className;
         } else {
-            $r = new ReflectionClass($className);
-            return $r->newInstanceArgs($constructors);
+            try {
+                $r = new ReflectionClass($className);
+                return $r->newInstanceArgs($constructors);
+            } catch (Exception $e) {
+                return null;
+            }
         }
     }
 }

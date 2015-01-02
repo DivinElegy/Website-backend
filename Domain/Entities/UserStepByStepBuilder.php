@@ -7,11 +7,6 @@ use Domain\VOs\IName;
 
 interface IUserStepByStepBuilder
 {
-    public function With_Country(ICountry $country);
-}
-
-interface IUserStepByStepBuilder_With_Country
-{
     public function With_DisplayName($name);
 }
 
@@ -38,6 +33,7 @@ interface IUserStepByStepBuilder_With_FacebookId
 interface IUserStepByStepBuilder_With_Quota
 {
     public function With_YearsStepArtist($years); //not going to make this mandatory as it is kind of a joke
+    public function With_Country(ICountry $country = null);
     public function build();
 }
     
@@ -52,14 +48,6 @@ abstract class AbstractUserStepByStepBuilder
 }
 
 class UserStepByStepBuilder extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder
-{
-    public function With_Country(ICountry $country) {
-        $this->_userBuilder->With_Country($country);
-        return new UserStepByStepBuilder_With_Country($this->_userBuilder);
-    }
-}
-
-class UserStepByStepBuilder_With_Country extends AbstractUserStepByStepBuilder implements IUserStepByStepBuilder_With_Country
 {
     public function With_DisplayName($name) {
         $this->_userBuilder->With_DisplayName($name);
@@ -107,6 +95,11 @@ class UserStepByStepBuilder_With_Quota extends AbstractUserStepByStepBuilder imp
         return $this;
     }
     
+    public function With_Country(ICountry $country = null) {
+        $this->_userBuilder->With_Country($country);
+        return $this;
+    }
+
     public function build() {
         return $this->_userBuilder
                     ->build();

@@ -21,7 +21,7 @@ interface IUserFactory
 class UserFactory implements IUserFactory
 {
     public function createInstance(
-        ICountry $country,
+        ICountry $country = null,
         $displayName,
         IName $name,
         array $tags,

@@ -18,5 +18,5 @@ interface IUser
     public function getQuota();
     
     public function setDisplayName($displayName);
-    public function setCountry(ICountry $country);
+    public function setCountry(ICountry $country = null);
 }

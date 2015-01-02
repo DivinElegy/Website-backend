@@ -23,7 +23,7 @@ class UserBuilder implements IUserBuilder
         $this->_userFactory = $userFactory;
     }
     
-    public function With_Country(ICountry $country) {
+    public function With_Country(ICountry $country = null) {
         $this->_country = $country;
         return $this;
     }

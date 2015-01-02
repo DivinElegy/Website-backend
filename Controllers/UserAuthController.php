@@ -78,22 +78,30 @@ class UserAuthController implements IDivineController
     {
         $userProfile = $this->_facebookRequest->getGraphObject(GraphUser::className());    
 
-        $homeTownPageId = $userProfile->getProperty('hometown')->getProperty('id');
-        $pageRequest = (new FacebookRequest($this->_facebookSession, 'GET', '/' . $homeTownPageId ))->execute();
-        $pageLocation = $pageRequest->getGraphObject(GraphLocation::className())->getProperty('location')->cast(GraphLocation::className());
+        $homeTown = $userProfile->getProperty('hometown');   
         
-        $country = Util::countryNameFromLatLong($pageLocation->getLatitude(), $pageLocation->getLongitude());
+        if($homeTown)
+        {
+            $homeTownPageId = $homeTown ? $homeTown->getProperty('id') : null;
+
+            $pageRequest = (new FacebookRequest($this->_facebookSession, 'GET', '/' . $homeTownPageId ))->execute();
+            $pageLocation = $pageRequest->getGraphObject(GraphLocation::className())->getProperty('location')->cast(GraphLocation::className());
+
+            $country = Util::countryNameFromLatLong($pageLocation->getLatitude(), $pageLocation->getLongitude());
+        }
+        
         $firstName = $userProfile->getFirstName();
         $lastName = $userProfile->getLastName();
         $facebookId = $userProfile->getId();
-
+        
         //TODO: Is insantiating the VO classes here a good idea?
-        $newUser = $this->_userStepByStepBuilder->With_Country(new \Domain\VOs\Country($country))
-                                                ->With_DisplayName($firstName)
+        $newUser = $this->_userStepByStepBuilder->With_DisplayName($firstName)
                                                 ->With_Name(new \Domain\VOs\Name($firstName, $lastName))
                                                 ->With_Tags(array())
                                                 ->With_FacebookId($facebookId)
                                                 ->With_Quota(100000000) //XXX: quota is in bytes
+                                                //XXX: Is this confusing? Maybe better to do a conditional and only call with_country when we have a country
+                                                ->With_Country(isset($country) ? new \Domain\VOs\Country($country) : null)
                                                 ->build();
                 
         $this->_userRepository->save($newUser);

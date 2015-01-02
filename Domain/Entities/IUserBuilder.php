@@ -7,7 +7,7 @@ use Domain\VOs\IName;
 
 interface IUserBuilder
 {
-    public function With_Country(ICountry $country);
+    public function With_Country(ICountry $country = null);
     public function With_DisplayName($name);
     public function With_Name(IName $name);
     public function With_Tags(array $tags);
