@@ -67,7 +67,6 @@ return [
     ],
     
     '/files/simfile/:hash' => [
-        'methods' => ['GET'],
         'controller' => 'File',
         'actions' => [
             'GET' => 'serveSimfileOrPack'

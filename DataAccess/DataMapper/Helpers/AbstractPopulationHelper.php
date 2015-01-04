@@ -39,9 +39,9 @@ class AbstractPopulationHelper
         return $constructors;
     }
     
-    static function generateUpdateSaveQuery($maps, $entity, $id, $db, &$queries = array(), $extraColumns = array())
+    static function generateUpdateSaveQuery($maps, $entity, $id, $db, &$queries = array(), $extraColumns = array(), $mapsIndex = null)
     {
-        $entityMapsIndex = self::getMapsNameFromEntityObject($entity, $maps);
+        $entityMapsIndex = isset($mapsIndex) ? $mapsIndex : self::getMapsNameFromEntityObject($entity, $maps);
 
         if($id)
         {
@@ -53,17 +53,29 @@ class AbstractPopulationHelper
         foreach($maps[$entityMapsIndex]['maps'] as $mapsHelper)
         {
             $accessor = $mapsHelper->getAccessor();
-            $property = $entity->{$accessor}();
+            $property = isset($entity) ? $entity->{$accessor}() : null;
 
             //sometimes children objects will be null, e.g., the banner for a simfile
-            //just skip them
-            if(!is_null($property)) 
+            //just skip them.
+            //Tricky: only skip when we're making a new entity. In the case of
+            //existing ones we need to cater for null objects. For example a user
+            //might change their country to null.
+            if((!is_null($property) || (is_null($property) && $id))) 
             {
                 switch(get_class($mapsHelper))
                 {
                     case 'DataAccess\DataMapper\Helpers\VOMapsHelper':
                         //we have a vo. Determine which way the reference is
-                        $voMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
+                        //
+                        //TODO: This is how I used to do this, but it failed if the property was NULL.
+                        //I dunno if I will have to do a similar thing with entity references (next case block)
+                        //but I'm leaving this here as a reminder if I ever have to come back to thiat.
+                        //
+                        //Notice I also added mapsIndex to the generateUpdateSaveQuery thing, that's important.
+                        //When I call it in this case block you can see I added voMapsIndex as that argument.
+                        //God I hope I can remember this stuff in the future.
+                        //$voMapsIndex = self::getMapsNameFromEntityObject($property, $maps);
+                        $voMapsIndex = $mapsHelper->getVOName();
                         $refDir = self::getReferenceDirection(
                             $maps[$entityMapsIndex]['table'],
                             $maps[$voMapsIndex]['table'],
@@ -76,7 +88,7 @@ class AbstractPopulationHelper
                             // our table stores their ID, all we do is update
                             // our reference.
                             case self::REFERENCE_FORWARD:
-                                $voTableId = self::findVOInDB($maps, $property, $db);
+                                $voTableId = self::findVOInDB($maps, $voMapsIndex, $property, $db);
 
                                 if($id)
                                 {
@@ -119,15 +131,16 @@ class AbstractPopulationHelper
                                 break;
                             case self::REFERENCE_BACK:
                                 $voId = self::findVOInDB($maps,
+                                    $voMapsIndex,
                                     $property,
                                     $db,
                                     array(strtolower($entityMapsIndex . '_id') => $id));
                                 if($voId)
                                 {
-                                    self::generateUpdateSaveQuery($maps, $property, $voId, $db, $queries);   
+                                    self::generateUpdateSaveQuery($maps, $property, $voId, $db, $queries, null, $voMapsIndex);   
                                 } else {
                                     $extra = array(strtolower($entityMapsIndex . '_id') => '%MAIN_QUERY_ID%');
-                                    self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries, $extra);
+                                    self::generateUpdateSaveQuery($maps, $property, NULL, $db, $queries, $extra, $voMapsIndex);
                                 }
                                 break;
                         }
@@ -203,12 +216,18 @@ class AbstractPopulationHelper
                         break;
                     case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
                         //XXX: pls magically fix all my character encoding issues.
-                        $property = mb_convert_encoding($property, "UTF-8", mb_detect_encoding($property, "UTF-8, ISO-8859-1, ISO-8859-15", true));
+                        $property = isset($property) ? mb_convert_encoding($property, "UTF-8", mb_detect_encoding($property, "UTF-8, ISO-8859-1, ISO-8859-15", true)) : NULL;
                         if($id){
                             //easy case, plain values in our table.
-                            $query .= sprintf('%s="%s", ',
-                                $mapsHelper->getColumnName(),
-                                $property);                        
+                            if(isset($property))
+                            {
+                                $query .= sprintf('%s="%s", ',
+                                    $mapsHelper->getColumnName(),
+                                    $property);     
+                            } else {
+                                $query .= sprintf('%s=NULL, ',
+                                    $mapsHelper->getColumnName());                                     
+                            }
                         } else {
                             $queryColumnNamesAndValues[$mapsHelper->getColumnName()] = $db->quote($property);
                         }
@@ -364,9 +383,9 @@ class AbstractPopulationHelper
     }
     
     // can use this when we reference a VO
-    static public function findVOInDB($maps, $VO, $db, $extraColumns = array())
+    static public function findVOInDB($maps, $mapsIndex, $VO, $db, $extraColumns = array())
     {
-        $mapsIndex = self::getMapsNameFromEntityObject($VO, $maps);
+        //$mapsIndex = self::getMapsNameFromEntityObject($VO, $maps);
         $table = $maps[$mapsIndex]['table'];
 
         //TODO: This may break everythign, but I _think_ if I pass extraColuns, it is always an id column.

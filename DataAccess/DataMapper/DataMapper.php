@@ -70,7 +70,7 @@ class DataMapper implements IDataMapper
             $queries = AbstractPopulationHelper::generateUpdateSaveQuery($this->_maps, $entity, $entity->getId(), $this->_db);
             $mergeMap = array();
             $flattened = array();
-            
+
             foreach($queries as $index => $query)
             {
                 $this_table = $query['table'];
