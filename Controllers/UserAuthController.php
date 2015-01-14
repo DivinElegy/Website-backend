@@ -7,13 +7,11 @@ use Services\Http\IHttpResponse;
 use Services\Http\IHttpRequest;
 use Services\IFacebookSessionFactory;
 use Domain\Entities\IUserStepByStepBuilder;
-use Domain\Entities\IUser;
 use DataAccess\IUserRepository;
 use Facebook\FacebookSession;
 use Facebook\FacebookRequest;
 use Facebook\GraphUser;
 use Facebook\GraphLocation;
-use Facebook\FacebookRequestException;
 
 class UserAuthController implements IDivineController
 {
@@ -46,6 +44,9 @@ class UserAuthController implements IDivineController
         $token = $this->validateAuthRequest();
         $facebookSession = $this->_facebookSessionFactory->createInstance($token);
         
+        //If it fails to validate the exception will deal with it.
+        $facebookSession->validate();
+        
         $this->_facebookSession = $this->isSessionLongLived($facebookSession) ? $facebookSession->getLongLivedSession() : $facebookSession;
         $this->_facebookRequest = (new FacebookRequest($this->_facebookSession, 'GET', '/me?fields=hometown,first_name,last_name'))->execute();
 
@@ -66,6 +67,8 @@ class UserAuthController implements IDivineController
 
         if(!isset($request['token']))
         {
+            //TODO: Perhaps I should be using the status reporter class here (and above).
+            //Will require changes to front end though, but at least it would be more consistent.
             $response->setBody(json_encode(array('result' => 'error', 'message' => 'missing auth token')))
                      ->sendResponse();            
             die();            
