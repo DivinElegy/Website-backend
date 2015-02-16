@@ -22,7 +22,13 @@ class AbstractPopulationHelper
             switch(get_class($mapsHelper))
             {
                 case 'DataAccess\DataMapper\Helpers\IntMapsHelper':
-                    if(!empty($row[$mapsHelper->getColumnName()]) && (string)(int)$row[$mapsHelper->getColumnName()] != $row[$mapsHelper->getColumnName()]) throw new Exception('Expected numeric value.');
+                    if(
+                        !empty($row[$mapsHelper->getColumnName()]) &&
+                        (string)(int)$row[$mapsHelper->getColumnName()] != $row[$mapsHelper->getColumnName()] &&
+                        (string)(int)$row[$mapsHelper->getColumnName()] != PHP_INT_MAX //FFFFFFFFFFF
+                    ) {
+                        throw new Exception('Expected numeric value.');
+                    }
                     $constructors[$constructor] = (int)$row[$mapsHelper->getColumnName()];
                     break;
                 case 'DataAccess\DataMapper\Helpers\VarcharMapsHelper':
