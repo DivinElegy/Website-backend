@@ -56,8 +56,16 @@ class FileRepository implements IFileRepository
                     'File',
                     $queryBuilder
                    );
-                
-        return reset($results);
+        
+        //XXX: Hack. Sometimes instead of getting a real array back we get the
+        //lazyload thing because I was an idiot with the database. Originally
+        //I simply did return reset($results) but if we don't have an array that
+        //won't work. So instead do a foreach (lazyload thing is iterable) and just
+        //return the first element.
+        foreach($results as $result)
+        {
+            return $result;
+        }
     }
     
     public function save(\Domain\Entities\IFile $file) {
