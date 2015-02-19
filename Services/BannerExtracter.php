@@ -6,6 +6,7 @@ use ZipArchive;
 use finfo;
 use Exception;
 use Services\IBannerExtracter;
+use Services\IConfigManager;
 use Domain\Entities\IFileStepByStepBuilder;
 
 //TODO: This class can probably be refactored to be nicer. Also perhaps the methods could be static?
@@ -14,9 +15,11 @@ class BannerExtracter implements IBannerExtracter
     private $_builder;
     private $_destinationFileName;
     private $_hash;
+    private $_configManager;
 
-    public function __construct(IFileStepByStepBuilder $builder) {
+    public function __construct(IFileStepByStepBuilder $builder, IConfigManager $configManager) {
         $this->_builder = $builder;
+        $this->_configManager = $configManager;
     }
     
     public function extractSongBanner($zipfile, $bannerName) {
@@ -35,7 +38,7 @@ class BannerExtracter implements IBannerExtracter
             {
                 $this->_hash = md5_file('zip://' . $zipfile . '#' . $stat['name']);
                 $this->_destinationFileName = $this->_hash . '.' . pathinfo($bannerName, PATHINFO_EXTENSION);
-                $result = copy('zip://' . $zipfile . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);
+                $result = copy('zip://' . $zipfile . '#' . $stat['name'], $this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
                 break;
             }
         }
@@ -43,8 +46,8 @@ class BannerExtracter implements IBannerExtracter
         if(!isset($result) || !$result) return null;
 
         $finfo = new finfo(FILEINFO_MIME);
-        $mimetype = $finfo->file('../files/banners/' . $this->_destinationFileName);
-        $size = filesize('../files/banners/' . $this->_destinationFileName);
+        $mimetype = $finfo->file($this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
+        $size = filesize($this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
         /* @var $fff \Domain\Entities\FileStepByStepBuilder */
         return $this->_builder->With_Hash($this->_hash)
                               ->With_Path('banners')
@@ -79,7 +82,7 @@ class BannerExtracter implements IBannerExtracter
                     $this->_hash = md5_file('zip://' . realpath($zipfile) . '#' . $stat['name']);
                     $this->_destinationFileName = $this->_hash . '.' . pathinfo($stat['name'], PATHINFO_EXTENSION);
                     $bannerName = $pathComponents[1];
-                    $result = copy('zip://' . realpath($zipfile) . '#' . $stat['name'], '../files/banners/' . $this->_destinationFileName);
+                    $result = copy('zip://' . realpath($zipfile) . '#' . $stat['name'], $this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
                     break;
                 }
             }
@@ -88,8 +91,8 @@ class BannerExtracter implements IBannerExtracter
         if(!isset($result) || !$result) return null;
         
         $finfo = new finfo(FILEINFO_MIME);
-        $mimetype = $finfo->file('../files/banners/' . $this->_destinationFileName);
-        $size = filesize('../files/banners/' . $this->_destinationFileName);
+        $mimetype = $finfo->file($this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
+        $size = filesize($this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
         /* @var $fff \Domain\Entities\FileStepByStepBuilder */
         return $this->_builder->With_Hash($this->_hash)
                               ->With_Path('banners')

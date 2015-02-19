@@ -15,6 +15,7 @@ use Services\IZipParser;
 use Services\IUserSession;
 use Services\IStatusReporter;
 use Services\InvalidSmFileException;
+use Services\IConfigManager;
 
 class ZipParser implements IZipParser
 {
@@ -27,6 +28,7 @@ class ZipParser implements IZipParser
     private $_userSession;
     private $_file;
     private $_statusReporter;
+    private $_configManager;
     
     public function __construct(
         ISimfileParser $smParser,
@@ -34,7 +36,8 @@ class ZipParser implements IZipParser
         IPackStepByStepBuilder $packBuilder,
         IBannerExtracter $bannerExtracter,
         IUserSession $userSession,
-        IStatusReporter $statusReporter
+        IStatusReporter $statusReporter,
+        IConfigManager $configManager
     ) {
         $this->_smParser = $smParser;
         $this->_smBuilder = $smBuilder;
@@ -42,6 +45,7 @@ class ZipParser implements IZipParser
         $this->_bannerExtracter = $bannerExtracter;
         $this->_userSession = $userSession;
         $this->_statusReporter = $statusReporter;
+        $this->_configManager = $configManager;
     }
     
     public function parse(IFile $file)
@@ -49,7 +53,7 @@ class ZipParser implements IZipParser
         $this->_file = $file;
         $this->_za = new ZipArchive();
         //XXX: We assume all files are zips. Should be enforced by validation elsewhere.
-        $res = $this->_za->open('../files/StepMania/' . $file->getHash() . '.zip');
+        $res = $this->_za->open($this->_configManager->getDirective('filesPath') . '/StepMania/' . $file->getHash() . '.zip');
 
         if($res !== true) throw new Exception ('Could not open zip for reading.');
         $this->findSms();
@@ -60,7 +64,7 @@ class ZipParser implements IZipParser
         if(count($this->_smFiles) > 1)
         {         
             $packname = $this->packNameFromFiles();
-            $banner = $this->_bannerExtracter->extractPackBanner('../files/StepMania/' . $this->_file->getHash() . '.zip', $packname);
+            $banner = $this->_bannerExtracter->extractPackBanner($this->_configManager->getDirective('filesPath') . '/StepMania/' . $this->_file->getHash() . '.zip', $packname);
 
             /* @var $builder \Domain\Entities\StepMania\PackStepByStepBuilder */
             $builder = $this->_packBuilder;
@@ -96,7 +100,7 @@ class ZipParser implements IZipParser
             $stat = $this->_za->statIndex($i);
             if(pathinfo($stat['name'], PATHINFO_EXTENSION) == 'sm')
             {
-                $path = realpath('../files/StepMania/' . $this->_file->getHash() . '.zip');
+                $path = realpath($this->_configManager->getDirective('filesPath') . '/StepMania/' . $this->_file->getHash() . '.zip');
                 $smData = file_get_contents('zip://' . $path . '#' . $stat['name']);
                 $this->_smFiles[$stat['name']] = $smData;
             }
@@ -149,7 +153,7 @@ class ZipParser implements IZipParser
     {
         $parser = $this->_smParser;
         $parser->parse($smData);
-        $banner = $this->_bannerExtracter->extractSongBanner(realpath('../files/StepMania/' . $this->_file->getHash() . '.zip'), $parser->banner());
+        $banner = $this->_bannerExtracter->extractSongBanner(realpath($this->_configManager->getDirective('filesPath') . '/StepMania/' . $this->_file->getHash() . '.zip'), $parser->banner());
         $file = $this->isPack() ? null : $this->_file;
 
         return $this->_smBuilder->With_Title($parser->title())

@@ -354,6 +354,9 @@ class Util
             }
         }
 
+        usort($singleSteps, array("Self", "cmp"));
+        usort($doubleSteps, array("Self", "cmp"));
+        
         return array(            
             'title' => $simfile->getTitle(),
             'artist' => $simfile->getArtist()->getName(),
@@ -370,5 +373,19 @@ class Util
             'uploaded' => $simfile->getSimfile() ? date('F jS, Y', $simfile->getSimfile()->getUploadDate()) : null,
             'hash' => $simfile->getSimfile() ? $simfile->getSimfile()->getHash() : null
         );
+    }
+    
+    private static function cmp($a, $b)
+    {
+        $order = array(
+            'Novice' => 0,
+            'Easy' => 1,
+            'Medium' => 2,
+            'Hard' => 3,
+            'Expert' => 4,
+            'Edit' => 5
+        );
+                
+        return $order[$a['difficulty']] - $order[$b['difficulty']];
     }
 }

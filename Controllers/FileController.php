@@ -8,6 +8,7 @@ use Services\Http\IHttpResponse;
 use Services\IUserSession;
 use Services\IStatusReporter;
 use Services\IUserQuota;
+use Services\IConfigManager;
 use Domain\Entities\IDownloadFactory;
 use DataAccess\IFileRepository;
 use DataAccess\IDownloadRepository;
@@ -22,6 +23,7 @@ class FileController implements IDivineController
     private $_userSession;
     private $_userQuota;
     private $_statusReporter;
+    private $_configManager;
     
     public function __construct(
         IHttpRequest $request,
@@ -31,7 +33,8 @@ class FileController implements IDivineController
         IDownloadRepository $downloadRepository,
         IUserSession $userSession,
         IUserQuota $userQuota,
-        IStatusReporter $statusReporter
+        IStatusReporter $statusReporter,
+        IConfigManager $configManager
     ) {
         $this->_request = $request;
         $this->_response = $response;
@@ -41,6 +44,7 @@ class FileController implements IDivineController
         $this->_userSession = $userSession;
         $this->_userQuota = $userQuota;
         $this->_statusReporter = $statusReporter;
+        $this->_configManager = $configManager;
     }
     
     public function indexAction() {
@@ -61,7 +65,7 @@ class FileController implements IDivineController
             if($hash == 'default') $this->serveDefaultBanner();
             if(!$file) $this->notFound();
 
-            $matches = glob(realpath('../files/' . $file->getPath()) . '/' . $file->getHash() . '.*');
+            $matches = glob(realpath($this->_configManager->getDirective('filesPath') . '/' . $file->getPath()) . '/' . $file->getHash() . '.*');
             $match = reset($matches);
             
             $this->_response->setHeader('Content-Type', $file->getMimetype())
@@ -82,7 +86,7 @@ class FileController implements IDivineController
         {
             $this->_response->setHeader("HTTP/1.1 304 Not Modified", 'Nice meme!');
         } else {
-            $path = '../files/banners/default.png';
+            $path = $this->_configManager->getDirective('filesPath') . '/banners/default.png';
             $file = realpath($path);
             $this->_response->setHeader('Content-Type', 'image/png')
                             ->setHeader('Content-Length', filesize($file))
@@ -113,7 +117,7 @@ class FileController implements IDivineController
         
         $this->_downloadRepository->save($download);
         
-        $zip = '../files/' . $file->getPath() . '/' . $file->getHash() . '.zip';
+        $zip = $this->_configManager->getDirective('filesPath') . '/' . $file->getPath() . '/' . $file->getHash() . '.zip';
         //TODO: This may not work on all browser or something. We'll have to see. Also it may hog ram so...
         $this->_response->setHeader('Content-Type', $file->getMimetype())
                         ->setHeader('Content-Length', $file->getSize())

@@ -2,7 +2,6 @@
 
 namespace Controllers;
 
-use Exception;
 use Controllers\IDivineController;
 use Services\Http\IHttpResponse;
 use Services\Http\IHttpRequest;
@@ -11,13 +10,12 @@ use Services\IUserSession;
 use Services\IZipParser;
 use Services\ISMOMatcher;
 use Services\IStatusReporter;
+use Services\IConfigManager;
 use DataAccess\StepMania\ISimfileRepository;
 use DataAccess\StepMania\IPackRepository;
 use DataAccess\IFileRepository;
 use DataAccess\IDownloadRepository;
-use Domain\Entities\StepMania\ISimfile;
 use Domain\Entities\IFile;
-use Domain\Entities\StepMania\IPack;
 use Domain\Util;
 
 class SimfileController implements IDivineController
@@ -33,6 +31,7 @@ class SimfileController implements IDivineController
     private $_downloadRepository;
     private $_statusReporter;
     private $_userSession;
+    private $_configManager;
     
     public function __construct(
         IHttpResponse $response,
@@ -45,7 +44,8 @@ class SimfileController implements IDivineController
         IZipParser $zipParser,
         ISMOMatcher $smoMatcher,
         IDownloadRepository $downloadRepository,
-        IStatusReporter $statusReporter
+        IStatusReporter $statusReporter,
+        IConfigManager $configManager
     ) {
         $this->_response = $response;
         $this->_request = $request;
@@ -58,6 +58,7 @@ class SimfileController implements IDivineController
         $this->_downloadRepository = $downloadRepository;
         $this->_statusReporter = $statusReporter;
         $this->_userSession = $userSession;
+        $this->_configManager = $configManager;
     }
     
     public function indexAction() {
@@ -128,7 +129,7 @@ class SimfileController implements IDivineController
         if(!$this->_userSession->getCurrentUser()) $this->_statusReporter->error('You must be authenticated to upload files');
         
         //TODO: Put directory in config ?
-        $files = $this->_uploadManager->setFilesDirectory('../files')
+        $files = $this->_uploadManager->setFilesDirectory($this->_configManager->getDirective('filesPath'))
                                       ->setDestination('StepMania/')
                                       ->process();
 
