@@ -62,10 +62,10 @@ class FileRepository implements IFileRepository
         //I simply did return reset($results) but if we don't have an array that
         //won't work. So instead do a foreach (lazyload thing is iterable) and just
         //return the first element.
-        foreach($results as $result)
-        {
-            return $result;
-        }
+        //
+        //XXX: Disregard, I fixed the DB at home so that wasn't an issue and never
+        //put it up on the live server. Idiot.
+        return reset($results);
     }
     
     public function save(\Domain\Entities\IFile $file) {
