@@ -114,7 +114,7 @@ class ZipParser implements IZipParser
         {
             try
             {
-                $this->_smFiles[$index] = $this->SmDataToSmClass($data);
+                $this->_smFiles[$index] = $this->SmDataToSmClass($data, $index);
             } catch(Exception $e) {
                 //Exceptions we care about at this stage
                 if(!$e instanceof InvalidSmFileException && 
@@ -149,11 +149,14 @@ class ZipParser implements IZipParser
         return $packName;
     }
         
-    private function SmDataToSmClass($smData)
-    {
+    private function SmDataToSmClass($smData, $index)
+    {      
         $parser = $this->_smParser;
         $parser->parse($smData);
-        $banner = $this->_bannerExtracter->extractSongBanner(realpath($this->_configManager->getDirective('filesPath') . '/StepMania/' . $this->_file->getHash() . '.zip'), $parser->banner());
+
+        $bannerIndex = $this->resolveBannerIndex($parser->banner(), $index);
+        $banner = $this->_bannerExtracter->extractSongBanner(realpath($this->_configManager->getDirective('filesPath') . '/StepMania/' . $this->_file->getHash() . '.zip'), $bannerIndex);
+
         $file = $this->isPack() ? null : $this->_file;
 
         return $this->_smBuilder->With_Title($parser->title())
@@ -168,5 +171,16 @@ class ZipParser implements IZipParser
                                 ->With_Simfile($file)
                                 ->With_Banner($banner)
                                 ->build();
+    }
+    
+    private function resolveBannerIndex($bannerDirective, $smFileIndex)
+    {
+        if(strpos($bannerDirective, '../') !== false || strpos($bannerDirective, '..\\') !== false)
+        {
+            $pathInfo = pathinfo($smFileIndex);
+            return str_replace('..', dirname($pathInfo['dirname']), $bannerDirective);
+        }
+        
+        return dirname($smFileIndex) . '/' . $bannerDirective;
     }
 }

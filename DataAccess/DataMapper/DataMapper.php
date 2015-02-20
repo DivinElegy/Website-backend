@@ -153,14 +153,17 @@ class DataMapper implements IDataMapper
                     implode(', ', $info['columns']));
                 }
 
-                $queries[$index] = $query;
+                //The files table has hash and filename as a unique index.
+                //Some packs share the same banner for every file, and we only
+                //ever pull them out by hash. So this saves having loads of entries
+                $queries[$index] = $query . ' ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)';
             }
 
            // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)
            // {
                 $idMap = [];
                 foreach($queries as $index => $query)
-                {                                
+                {
                     $runQuery = true;
                     //originally was preg_quote('%').'(.*?)'.preg_quote('%') but that failed with things like:
                     //...VALUES ('Voyager Full 50%', %INDEX_REF_0%

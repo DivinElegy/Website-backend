@@ -22,7 +22,7 @@ class BannerExtracter implements IBannerExtracter
         $this->_configManager = $configManager;
     }
     
-    public function extractSongBanner($zipfile, $bannerName) {
+    public function extractSongBanner($zipfile, $bannerIndex) {
         $za = new ZipArchive();
         //XXX: We assume all files are zips. Should be enforced by validation elsewhere.
         $res = $za->open($zipfile);
@@ -34,10 +34,10 @@ class BannerExtracter implements IBannerExtracter
             $stat = $za->statIndex($i);
             $type = @exif_imagetype('zip://' . realpath($zipfile) . '#' . $stat['name']);
             //Sometimes simfiles specify a video as their banner. Fuck dat.
-            if(basename($stat['name']) == $bannerName && $type !== false)
+            if($stat['name'] == $bannerIndex && $type !== false)
             {
                 $this->_hash = md5_file('zip://' . $zipfile . '#' . $stat['name']);
-                $this->_destinationFileName = $this->_hash . '.' . pathinfo($bannerName, PATHINFO_EXTENSION);
+                $this->_destinationFileName = $this->_hash . '.' . pathinfo($bannerIndex, PATHINFO_EXTENSION);
                 $result = copy('zip://' . $zipfile . '#' . $stat['name'], $this->_configManager->getDirective('filesPath') . '/banners/' . $this->_destinationFileName);
                 break;
             }
@@ -51,7 +51,7 @@ class BannerExtracter implements IBannerExtracter
         /* @var $fff \Domain\Entities\FileStepByStepBuilder */
         return $this->_builder->With_Hash($this->_hash)
                               ->With_Path('banners')
-                              ->With_Filename($bannerName)
+                              ->With_Filename(basename($bannerIndex))
                               ->With_Mimetype($mimetype)
                               ->With_Size($size)
                               ->With_UploadDate(time())
