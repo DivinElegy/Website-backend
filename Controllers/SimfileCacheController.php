@@ -31,10 +31,10 @@ class SimfileCacheController implements IDivineController
     
     public function indexAction() {
         $get = $this->_request->get();
-        if(!$get['token']) throw new Exception('Token missing');
+        if(!$get['cronToken']) throw new Exception('Token missing');
         
         //TODO: I should make $req->get('token') give the element and $req->get() return the array maybe?
-        if($get['token'] !== $this->_configManager->getDirective('cacheToken')) throw new Exception ('Invalid token');
+        if($get['cronToken'] !== $this->_configManager->getDirective('cronToken')) throw new Exception ('Invalid token');
         
         $all_files = scandir('../SimfileCache');
         natsort($all_files);
@@ -72,6 +72,12 @@ class SimfileCacheController implements IDivineController
                 unlink('../SimfileCache/' . $filename);
                 }
             }
+            
+            usort($completeArray['packs'], function($a, $b)
+            {
+                return strcmp($a['title'], $b['title']);
+            });
+            
             file_put_contents('../SimfileCache/simfiles.json',json_encode($completeArray));
         } else {
             foreach($simfiles as $simfile)

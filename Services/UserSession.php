@@ -20,6 +20,11 @@ class UserSession implements IUserSession
         $this->_currentUser = $token ? $this->_userRepository->findByAuthToken($token) : null;
     }
     
+    public function setCurrentUser($uid)
+    {
+        $this->_currentUser = $this->_userRepository->findById($uid);
+    }
+    
     public function getCurrentUser()
     {
         return $this->_currentUser;

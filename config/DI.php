@@ -33,6 +33,10 @@ return [
     'Services\Routing\IRouter'                            => DI\object('Services\Routing\Router')
                                                                 ->constructor(DI\link('router.maps')),
     'Services\Uploads\IUploadManager'                     => DI\object('Services\Uploads\UploadManager'),
+    'Services\Uploads\IUploadQueueManager'                => DI\object('Services\Uploads\UploadQueueManager')
+                                                                ->lazy(),
+    'Services\ICacheUpdater'                              => DI\object('Services\CacheUpdater')
+                                                                ->lazy(),
     'Services\IUserSession'                               => DI\object('Services\UserSession'),
     'Services\IUserQuota'                                 => DI\object('Services\UserQuota'),
     'Services\Uploads\IFileFactory'                       => DI\object('Services\Uploads\FileFactory'),

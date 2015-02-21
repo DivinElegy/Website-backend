@@ -102,7 +102,7 @@ class UserAuthController implements IDivineController
                                                 ->With_Name(new \Domain\VOs\Name($firstName, $lastName))
                                                 ->With_Tags(array())
                                                 ->With_FacebookId($facebookId)
-                                                ->With_Quota(100000000) //XXX: quota is in bytes
+                                                ->With_Quota(500000000) //XXX: quota is in bytes
                                                 //XXX: Is this confusing? Maybe better to do a conditional and only call with_country when we have a country
                                                 ->With_Country(isset($country) ? new \Domain\VOs\Country($country) : null)
                                                 ->build();

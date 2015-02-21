@@ -29,10 +29,17 @@ return [
         ]
     ],
     
-    '/simfiles/upload' => [
+    //'/simfiles/upload' => [
+    //    'controller' => 'Simfile',
+    //    'actions' => [
+    //        'POST' => 'upload'
+    //    ]
+    //],
+    
+    '/simfiles/upload/process' => [
         'controller' => 'Simfile',
         'actions' => [
-            'POST' => 'upload'
+            'GET' => 'processUploadQueue'
         ]
     ],
     
