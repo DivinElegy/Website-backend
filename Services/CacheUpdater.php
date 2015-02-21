@@ -31,7 +31,7 @@ class CacheUpdater implements ICacheUpdater
     {
         usort($this->_json['packs'], function($a, $b)
         {
-            return strcmp($a['title'], $b['title']);
+            return strcasecmp($a['title'], $b['title']);
         });
             
         file_put_contents('../SimfileCache/simfiles.json',json_encode($this->_json));
