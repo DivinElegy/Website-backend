@@ -196,7 +196,6 @@ class SimfileController implements IDivineController
             $pack = $zipParser->pack();
             $packBanner = $pack->getBanner() ? $this->_fileRepository->save($pack->getBanner()) : null;
             $this->_packRepository->save($pack);
-            $this->_cacheUpdater->insert($pack);
         }
 
         foreach($zipParser->simfiles() as $simfile)
@@ -207,6 +206,8 @@ class SimfileController implements IDivineController
             if(isset($pack)) $simfile->addToPack($pack);
             $this->_simfileRepository->save($simfile);
         }
+        
+        if(isset($pack)) $this->_cacheUpdater->insert($pack);
     }
     
     private function findAndAddSmoMirror(IFile $file)
