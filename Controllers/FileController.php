@@ -118,13 +118,11 @@ class FileController implements IDivineController
         $this->_downloadRepository->save($download);
         
         $zip = $this->_configManager->getDirective('filesPath') . '/' . $file->getPath() . '/' . $file->getHash() . '.zip';
-        //TODO: This may not work on all browser or something. We'll have to see. Also it may hog ram so...
         $this->_response->setHeader('Content-Type', $file->getMimetype())
                         ->setHeader('Content-Length', $file->getSize())
                         ->setHeader('Content-Disposition', 'filename="' . $file->getFileName() . '";')
-                        ->setHeader('Content-Transfer-Encoding', 'binary')
-                        ->setBody(file_get_contents($zip))
-                        ->sendResponse();
+                        ->download($zip);                                
+        exit();
     }
         
     private function notFound()

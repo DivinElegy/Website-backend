@@ -96,10 +96,16 @@ class HttpResponse implements IHttpResponse
     
     public function download($path)
     {
-        $fp = fopen($path, "rb");
-        $this->sendHeaders();
-        @ob_clean();
-        rewind($fp);
-        fpassthru($fp);
+        $this->sendResponse();
+        $fd = fopen($path, 'r');
+        if(!$fd) throw new Exception ('Failed to open file.');
+        
+        while(!feof($fd)) {
+            $buffer = fread($fd, 2048);
+            print $buffer;
+        }
+        fclose ($fd);
+        
+        exit();
     }
 }
