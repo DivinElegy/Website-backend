@@ -147,16 +147,17 @@ class DataMapper implements IDataMapper
                     $query = substr($query, 0, -2);
                     $query .= sprintf(' WHERE id=%u', $info['id']);
                 } else {
+                    //The files table has hash and filename as a unique index.
+                    //Some packs share the same banner for every file, and we only
+                    //ever pull them out by hash. So this on duplicate thing saves
+                    //having loads of entries
                     $query = sprintf('INSERT INTO %s (%s) VALUES (%s)',
                     $info['table'],
                     implode(', ', array_keys($info['columns'])),
-                    implode(', ', $info['columns']));
+                    implode(', ', $info['columns'])) . ' ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)';
                 }
-
-                //The files table has hash and filename as a unique index.
-                //Some packs share the same banner for every file, and we only
-                //ever pull them out by hash. So this saves having loads of entries
-                $queries[$index] = $query . ' ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)';
+                
+                $queries[$index] = $query;
             }
 
            // if($queries['TYPE'] == AbstractPopulationHelper::QUERY_TYPE_CREATE)
