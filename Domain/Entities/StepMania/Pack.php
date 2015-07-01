@@ -48,7 +48,12 @@ class Pack extends AbstractEntity implements IPack
             );
         }
         
-        return $contributors;
+        //XXX: If there are duplicate contributors, say, index 5 and 6 are the same
+        //then we loose index 5 and have an array like 1,2,3,4,6
+        //
+        //This makes json_encode use the indicies as object keys, so we need to
+        //reshuffle the array into a continuous list
+        return array_values($contributors);
     }
     
     public function getFile()
